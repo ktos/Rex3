@@ -37,6 +37,43 @@ connection.on("VotingInconclusive", function () {
     alert("voting inconclusive, you die");
 });
 
+connection.on("MapUpdate", function (maze) {
+    maze = JSON.parse(maze)
+
+    let html = "<table>";
+
+    for (let i = 0; i < maze.length; i++) {
+        html += "<tr>";
+        for (let j = 0; j < maze[i].length; j++) {
+            let s = ""
+
+            if (maze[j][i].includes("t")) {
+                s += "border-top: 1px black solid;";
+            }
+
+            if (maze[j][i].includes("r")) {
+                s += "border-right: 1px black solid;";
+            }
+
+            if (maze[j][i].includes("b")) {
+                s += "border-bottom: 1px black solid;";
+            }
+
+            if (maze[j][i].includes("l")) {
+                s += "border-left: 1px black solid;";
+            }
+
+            html += `<td style="${s}"></td>`;
+        }
+        html += "</tr>";
+    }
+
+    html += "</table>";
+
+    document.getElementById("map").innerHTML = html;
+
+});
+
 connection.start().then(function () {
     //document.getElementById("sendButton").disabled = false;
 }).catch(function (err) {
@@ -58,6 +95,16 @@ document.querySelectorAll("#voting > button").forEach(x => x.addEventListener("c
     let action = e.target.dataset.val;
 
     connection.invoke("Vote", user, action).catch(function (err) {
+        return console.error(err.toString());
+    });
+    e.preventDefault();
+}));
+
+document.querySelectorAll("#debug > button").forEach(x => x.addEventListener("click", function (e) {
+    let user = document.getElementById("userInput").value;
+    let action = e.target.innerText;
+
+    connection.invoke("Debug", user, action).catch(function (err) {
         return console.error(err.toString());
     });
     e.preventDefault();

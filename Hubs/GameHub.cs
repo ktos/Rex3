@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using MazeGeneration;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Rex3.Hubs
 {
@@ -24,7 +25,7 @@ namespace Rex3.Hubs
             //    {
             //        await Clients.All.SendAsync("VotingInconclusive");
             //    }
-            //});            
+            //});
         }
 
         public async Task Vote(string user, string action)
@@ -36,11 +37,13 @@ namespace Rex3.Hubs
                 switch (user)
                 {
                     case "clairvoyant":
-                        _state.Current.Clairvoyant = decision; break;
+                        _state.Current.Clairvoyant = decision;
+                        break;
                     case "navigator":
-                        _state.Current.Navigator = decision; break;
-                        //case "scribe":
-                        //    _state.Current.Scribe = decision; break;
+                        _state.Current.Navigator = decision;
+                        break;
+                    //case "scribe":
+                    //    _state.Current.Scribe = decision; break;
                 }
 
                 await Clients.All.SendAsync("VoteReceived", user);
@@ -48,14 +51,25 @@ namespace Rex3.Hubs
                 if (_state.Current.IsFinished())
                 {
                     await Clients.All.SendAsync("VotingFinished", _state.Current.CalculateResult());
-
                 }
             }
         }
 
-        public async Task SendMessage(string user, string message)
+        public async Task GameStarted()
         {
-            await Clients.All.SendAsync("Receive", user, message);
+            if (_state.Mazes.Count == 0)
+                _state.Mazes.Add(new Maze(5, 5));
+
+            await Clients.All.SendAsync("MapUpdate", _state.Mazes.First().CellStateToJson());
+        }
+
+        public async Task Debug(string user, string message)
+        {
+            if (message == "gamestarted")
+            {
+                await this.GameStarted();
+            }
+            //await Clients.All.SendAsync("Receive", user, message);
         }
     }
 }

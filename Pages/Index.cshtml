@@ -5,6 +5,10 @@
 }
 
 <div class="container">
+    <div id="debug">
+        <button>gamestarted</button>
+    </div>
+
     <div class="row p-1">
         <div class="col-1">User</div>
         <div class="col-5">
@@ -17,7 +21,10 @@
     </div>
     <div class="row p-1">
         <div class="col-6 text-end">
-            <button class="action" data-val="0">North</button>
+            <button class="action" data-val="0" id="north">North</button>
+            <button class="action" data-val="1" id="east">East</button>
+            <button class="action" data-val="2" id="south">South</button>
+            <button class="action" data-val="3" id="west">West</button>
         </div>
     </div>
 
@@ -25,6 +32,9 @@
         <p id="action"></p>
         <button data-val="1">Yes</button>
         <button data-val="0">No</button>
+    </div>
+
+    <div id="map">
     </div>
 
 </div>

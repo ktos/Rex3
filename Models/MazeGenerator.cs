@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace MazeGeneration
 {
@@ -131,6 +132,36 @@ namespace MazeGeneration
                 Console.WriteLine("   " + sbMid + "|");
             }
             Console.WriteLine(firstLine);
+        }
+
+        public string CellStateToJson()
+        {
+            string[,] serializedMaze = new string[_width, _height];
+
+            for (var x = 0; x < _height; x++)
+                for (var y = 0; y < _width; y++)
+                {
+                    serializedMaze[x, y] = "";
+
+                    if (this[x, y].HasFlag(CellState.Top))
+                    {
+                        serializedMaze[x, y] += 't';
+                    }
+                    if (this[x, y].HasFlag(CellState.Right))
+                    {
+                        serializedMaze[x, y] += 'r';
+                    }
+                    if (this[x, y].HasFlag(CellState.Bottom))
+                    {
+                        serializedMaze[x, y] += 'b';
+                    }
+                    if (this[x, y].HasFlag(CellState.Left))
+                    {
+                        serializedMaze[x, y] += 'l';
+                    }
+                }
+
+            return JsonConvert.SerializeObject(serializedMaze);
         }
     }
 
