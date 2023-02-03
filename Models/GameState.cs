@@ -10,6 +10,9 @@ namespace Rex3
         public List<Maze> Mazes { get; set; } = new List<Maze>();
 
         public Point CurrentLocation { get; set; }
+
+        public int HP { get; set; }
+        public int ATK { get; set; }
     }
 
     public class Voting
@@ -43,7 +46,7 @@ namespace Rex3
         North,
         East,
         West,
-        Down,
+        South,
         Special1
     }
 }

@@ -17,7 +17,9 @@ namespace Rex3.Hubs
 
         public async Task StartVotingForAction(string user, string action)
         {
-            _state.Current = new Voting() { Action = Action.North };
+            var ac = (Action)Convert.ToInt32(action);
+
+            _state.Current = new Voting() { Action = ac };
             await Clients.All.SendAsync("VotingStarted", user, _state.Current.Action);
 
             //Task.St
@@ -58,6 +60,36 @@ namespace Rex3.Hubs
 
                 // tymczasowo, głosowanie zawsze jest udane
                 await Clients.All.SendAsync("VotingFinished", true);
+
+                switch (_state.Current.Action)
+                {
+                    case Action.North:
+                        _state.CurrentLocation = new Point(
+                            _state.CurrentLocation.X - 1,
+                            _state.CurrentLocation.Y
+                        );
+                        break;
+                    case Action.East:
+                        _state.CurrentLocation = new Point(
+                            _state.CurrentLocation.X,
+                            _state.CurrentLocation.Y + 1
+                        );
+                        break;
+                    case Action.West:
+                        _state.CurrentLocation = new Point(
+                            _state.CurrentLocation.X,
+                            _state.CurrentLocation.Y - 1
+                        );
+                        break;
+                    case Action.South:
+                        _state.CurrentLocation = new Point(
+                            _state.CurrentLocation.X + 1,
+                            _state.CurrentLocation.Y
+                        );
+                        break;
+                }
+
+                await UpdateMapState();
             }
         }
 
@@ -69,6 +101,11 @@ namespace Rex3.Hubs
                 _state.CurrentLocation = new Point(0, 0);
             }
 
+            await UpdateMapState();
+        }
+
+        public async Task UpdateMapState()
+        {
             var ms = new MapState
             {
                 Cells = _state.Mazes.First().CellStateToStringArray(),

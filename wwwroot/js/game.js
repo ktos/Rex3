@@ -29,7 +29,7 @@ connection.on("VoteReceived", function (user) {
 
 connection.on("VotingFinished", function (result) {
     hideVoting();
-    alert("voting finished " + result);
+    //alert("voting finished " + result);
 });
 
 connection.on("VotingInconclusive", function () {
