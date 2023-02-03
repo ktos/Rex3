@@ -5,16 +5,6 @@
 }
 
 <div class="container">
-    <div id="debug">
-        <select id="userInput">
-            <option>clairvoyant</option>
-            <option>scribe</option>
-            <option>navigator</option>
-        </select>
-
-        <button>gamestarted</button>
-    </div>
-    
     <div class="row p-1">
         <div class="col-6 text-end">
             <button class="action" data-val="0" id="north">North</button>
@@ -22,6 +12,22 @@
             <button class="action" data-val="2" id="west">West</button>
             <button class="action" data-val="3" id="south">South</button>
             <button class="action" data-val="4" id="rest">Rest</button>
+        </div>
+    </div>
+    <div class="row p-1">
+        <div id="map" class="col-6">
+        </div>
+
+        <div id="debug" class="col-6">
+            <select id="userInput">
+                <option>clairvoyant</option>
+                <option>scribe</option>
+                <option>navigator</option>
+            </select>
+
+            <button>gamestarted</button>
+
+            <div id="debug-log"></div>
         </div>
     </div>
 
@@ -40,8 +46,7 @@
 
     </div>
 
-    <div id="map">
-    </div>
+
 
 </div>
 <script src="~/js/signalr/dist/browser/signalr.js"></script>

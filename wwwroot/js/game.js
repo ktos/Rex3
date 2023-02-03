@@ -12,34 +12,37 @@ function showVoting() {
     votingPanel.style.display = 'block';
 }
 
+function debug(msg) {
+    document.getElementById("debug-log").innerHTML += msg + "<br>";
+}
+
 hideVoting();
 
 connection.on("VotingStarted", function (user, action) {
-    console.log("voting started for action " + action)
+    debug("voting started for action " + action)
 
     showVoting();
 });
 
 connection.on("VoteReceived", function (user) {
-    console.log("vote received");
+    debug("vote received");
     let user2 = document.getElementById("userInput").value;
 
     if (user === user2) { hideVoting(); }
 });
 
 connection.on("VotingFinished", function (result) {
-    console.log("voting finished")
+    debug("voting finished")
     hideVoting();
     //alert("voting finished " + result);
 });
 
 connection.on("VotingInconclusive", function () {
     hideVoting();
-    alert("voting inconclusive, you die");
+    debug("voting inconclusive, you die");
 });
 
 connection.on("MapUpdate", function (state) {
-    console.log(state);
     let parsed = JSON.parse(state)
 
     let maze = parsed["Cells"];
@@ -127,9 +130,18 @@ document.querySelectorAll("button.action").forEach(x => x.addEventListener("clic
     let user = document.getElementById("userInput").value;
     let action = e.target.dataset.val;
 
+    // invoking StartVotingForAction
     connection.invoke("StartVotingForAction", user, action).catch(function (err) {
         return console.error(err.toString());
     });
+
+    // but also invoking timeout function
+    setTimeout(function () {
+        connection.invoke("VotingTimeout", user).catch(function (err) {
+            return console.error(err.toString());
+        });
+    }, 5000);
+
     e.preventDefault();
 }));
 

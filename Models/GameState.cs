@@ -8,6 +8,7 @@ namespace Rex3
     {
         public List<Voting> VotingHistory { get; set; }
         public Voting? Current { get; set; } = null;
+        public int Inconclusive { get; set; } = 0;
         public List<Maze> Mazes { get; set; }
         public List<Level> Levels { get; set; }
         public int CurrentLevel { get; set; }

@@ -35,7 +35,18 @@ namespace Rex3.Hubs
 
         public async Task VotingTimeout(string user)
         {
-            
+            if (_state.Current != null && !_state.Current.IsFinished())
+            {
+                _state.Inconclusive++;
+                ArchiveVoting();
+                await Clients.All.SendAsync("VotingInconclusive");
+
+                if (_state.Inconclusive == 2)
+                {
+                    _state.HP--;
+                    await SendUpdatedState();
+                }
+            }
         }
 
         public async Task Vote(string user, string action)
@@ -62,7 +73,7 @@ namespace Rex3.Hubs
                 //if (_state.Current.IsFinished())
                 if (true)
                 {
-                    
+
                     await Clients.All.SendAsync("VotingFinished", true);
 
                     switch (_state.Current.Action)
@@ -94,18 +105,23 @@ namespace Rex3.Hubs
                     }
 
                     // archiving of the votes
-                    _state.VotingHistory.Add(_state.Current);
-                    _state.Current = null;
+                    ArchiveVoting();
 
                     // update energy, move enemies
                     await UpdateEnergy();
                     await MoveEnemies();
 
-                    await UpdateMapState();
+                    await SendUpdatedState();
                 }
 
 
             }
+        }
+
+        private void ArchiveVoting()
+        {
+            _state.VotingHistory.Add(_state.Current);
+            _state.Current = null;
         }
 
         private async Task UpdateEnergy()
@@ -129,10 +145,10 @@ namespace Rex3.Hubs
                 _state.CurrentLocation = new Point(0, 0);
             }
 
-            await UpdateMapState();
+            await SendUpdatedState();
         }
 
-        public async Task UpdateMapState()
+        public async Task SendUpdatedState()
         {
             var ms = new MapState
             {
