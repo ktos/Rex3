@@ -28,6 +28,7 @@ connection.on("VoteReceived", function (user) {
 });
 
 connection.on("VotingFinished", function (result) {
+    console.log("voting finished")
     hideVoting();
     //alert("voting finished " + result);
 });
@@ -43,6 +44,12 @@ connection.on("MapUpdate", function (state) {
 
     let maze = parsed["Cells"];
     let pos = [parsed["X"], parsed["Y"]]
+    let hp = parsed["HP"]
+    let energy = parsed["Energy"]
+    let energyRecovery = parsed.Level.EnergyRecoveryRate
+    let turn = parsed["Turn"]
+    let votingHistory = parsed["VotingHistory"]
+    let secret = parsed.Level.ClairvoyantGoal
 
     let html = "<table>";
 
@@ -102,6 +109,11 @@ connection.on("MapUpdate", function (state) {
     if (maze[pos[1]][pos[0]].includes("l")) {
         document.getElementById("west").disabled = true;
     }
+
+    document.getElementById('votinghistory').textContent = votingHistory;
+    document.getElementById('scribe').textContent = `HP: ${hp}, Energy: ${energy} ${energyRecovery}, Turn: ${turn}`;
+
+    document.getElementById('secret').textContent = secret;
 
 });
 

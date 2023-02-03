@@ -6,25 +6,22 @@
 
 <div class="container">
     <div id="debug">
+        <select id="userInput">
+            <option>clairvoyant</option>
+            <option>scribe</option>
+            <option>navigator</option>
+        </select>
+
         <button>gamestarted</button>
     </div>
-
-    <div class="row p-1">
-        <div class="col-1">User</div>
-        <div class="col-5">
-            <select id="userInput">
-                <option>clairvoyant</option>
-                @*<option>scribe</option>*@
-                <option>navigator</option>
-            </select>
-        </div>
-    </div>
+    
     <div class="row p-1">
         <div class="col-6 text-end">
             <button class="action" data-val="0" id="north">North</button>
             <button class="action" data-val="1" id="east">East</button>
             <button class="action" data-val="2" id="west">West</button>
             <button class="action" data-val="3" id="south">South</button>
+            <button class="action" data-val="4" id="rest">Rest</button>
         </div>
     </div>
 
@@ -32,6 +29,15 @@
         <p id="action"></p>
         <button data-val="1">Yes</button>
         <button data-val="0">No</button>
+    </div>
+
+    <div id="votinghistory"></div>
+
+    <div id="secret">
+    </div>
+
+    <div id="scribe">
+
     </div>
 
     <div id="map">

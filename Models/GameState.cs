@@ -1,18 +1,32 @@
 ﻿using MazeGeneration;
+using Rex3.Models;
 using System.Drawing;
 
 namespace Rex3
 {
     public class GameState
     {
-        public List<Voting> VotingHistory { get; set; } = new List<Voting>();
+        public List<Voting> VotingHistory { get; set; }
         public Voting? Current { get; set; } = null;
-        public List<Maze> Mazes { get; set; } = new List<Maze>();
+        public List<Maze> Mazes { get; set; }
+        public List<Level> Levels { get; set; }
+        public int CurrentLevel { get; set; }
 
         public Point CurrentLocation { get; set; }
 
         public int HP { get; set; }
-        public int ATK { get; set; }
+        public int Energy { get; set; }
+        public int Turn => VotingHistory.Count;
+
+        public GameState()
+        {
+            VotingHistory = new List<Voting>();
+            Mazes = new List<Maze>();
+            Levels = new List<Level>();
+
+            Levels.Add(new Level { EnergyRecoveryRate = 3 });
+        }
+
     }
 
     public class Voting
@@ -20,7 +34,8 @@ namespace Rex3
         public Action Action { get; set; }
         public bool? Clairvoyant { get; set; }
         public bool? Navigator { get; set; }
-        //public bool? Scribe { get; set; }
+        
+        public bool? Scribe { get; set; }
 
         public bool IsFinished()
         {
@@ -47,6 +62,6 @@ namespace Rex3
         East,
         West,
         South,
-        Special1
+        Rest
     }
 }

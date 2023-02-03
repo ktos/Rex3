@@ -33,6 +33,11 @@ namespace Rex3.Hubs
             //});
         }
 
+        public async Task VotingTimeout(string user)
+        {
+            
+        }
+
         public async Task Vote(string user, string action)
         {
             bool decision = action == "1";
@@ -47,50 +52,73 @@ namespace Rex3.Hubs
                     case "navigator":
                         _state.Current.Navigator = decision;
                         break;
-                    //case "scribe":
-                    //    _state.Current.Scribe = decision; break;
+                    case "scribe":
+                        _state.Current.Scribe = decision; break;
                 }
 
                 await Clients.All.SendAsync("VoteReceived", user);
 
+                // tymczasowo, głosowanie zawsze jest udane, po jednym
                 //if (_state.Current.IsFinished())
-                //{
-                //    await Clients.All.SendAsync("VotingFinished", _state.Current.CalculateResult());
-                //}
-
-                // tymczasowo, głosowanie zawsze jest udane
-                await Clients.All.SendAsync("VotingFinished", true);
-
-                switch (_state.Current.Action)
+                if (true)
                 {
-                    case Action.North:
-                        _state.CurrentLocation = new Point(
-                            _state.CurrentLocation.X - 1,
-                            _state.CurrentLocation.Y
-                        );
-                        break;
-                    case Action.East:
-                        _state.CurrentLocation = new Point(
-                            _state.CurrentLocation.X,
-                            _state.CurrentLocation.Y + 1
-                        );
-                        break;
-                    case Action.West:
-                        _state.CurrentLocation = new Point(
-                            _state.CurrentLocation.X,
-                            _state.CurrentLocation.Y - 1
-                        );
-                        break;
-                    case Action.South:
-                        _state.CurrentLocation = new Point(
-                            _state.CurrentLocation.X + 1,
-                            _state.CurrentLocation.Y
-                        );
-                        break;
+                    
+                    await Clients.All.SendAsync("VotingFinished", true);
+
+                    switch (_state.Current.Action)
+                    {
+                        case Action.North:
+                            _state.CurrentLocation = new Point(
+                                _state.CurrentLocation.X - 1,
+                                _state.CurrentLocation.Y
+                            );
+                            break;
+                        case Action.East:
+                            _state.CurrentLocation = new Point(
+                                _state.CurrentLocation.X,
+                                _state.CurrentLocation.Y + 1
+                            );
+                            break;
+                        case Action.West:
+                            _state.CurrentLocation = new Point(
+                                _state.CurrentLocation.X,
+                                _state.CurrentLocation.Y - 1
+                            );
+                            break;
+                        case Action.South:
+                            _state.CurrentLocation = new Point(
+                                _state.CurrentLocation.X + 1,
+                                _state.CurrentLocation.Y
+                            );
+                            break;
+                    }
+
+                    // archiving of the votes
+                    _state.VotingHistory.Add(_state.Current);
+                    _state.Current = null;
+
+                    // update energy, move enemies
+                    await UpdateEnergy();
+                    await MoveEnemies();
+
+                    await UpdateMapState();
                 }
 
-                await UpdateMapState();
+
             }
+        }
+
+        private async Task UpdateEnergy()
+        {
+            if (_state.Turn % _state.Levels[_state.CurrentLevel].EnergyRecoveryRate == 0)
+            {
+                _state.Energy++;
+            }
+        }
+
+        private async Task MoveEnemies()
+        {
+            
         }
 
         public async Task GameStarted()
@@ -110,7 +138,12 @@ namespace Rex3.Hubs
             {
                 Cells = _state.Mazes.First().CellStateToStringArray(),
                 X = _state.CurrentLocation.X,
-                Y = _state.CurrentLocation.Y
+                Y = _state.CurrentLocation.Y,
+                HP = _state.HP,
+                Energy = _state.Energy,
+                Turn = _state.Turn,
+                VotingHistory = _state.VotingHistory.Select(x => x.CalculateResult()).ToList(),
+                Level = _state.Levels[_state.CurrentLevel]
             };
             var serializedMs = JsonConvert.SerializeObject(ms);
 
