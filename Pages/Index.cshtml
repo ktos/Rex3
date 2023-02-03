@@ -4,7 +4,29 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container">
+    <div class="row p-1">
+        <div class="col-1">User</div>
+        <div class="col-5">
+            <select id="userInput">
+                <option>clairvoyant</option>
+                @*<option>scribe</option>*@
+                <option>navigator</option>
+            </select>
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6 text-end">
+            <button class="action" data-val="0">North</button>
+        </div>
+    </div>
+
+    <div id="voting">
+        <p id="action"></p>
+        <button data-val="1">Yes</button>
+        <button data-val="0">No</button>
+    </div>
+
 </div>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/game.js"></script>
