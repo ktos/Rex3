@@ -37,15 +37,20 @@ connection.on("VotingInconclusive", function () {
     alert("voting inconclusive, you die");
 });
 
-connection.on("MapUpdate", function (maze) {
-    maze = JSON.parse(maze)
+connection.on("MapUpdate", function (state) {
+    console.log(state);
+    let parsed = JSON.parse(state)
+
+    let maze = parsed["Cells"];
+    let pos = [parsed["X"], parsed["Y"]]
 
     let html = "<table>";
 
     for (let i = 0; i < maze.length; i++) {
         html += "<tr>";
         for (let j = 0; j < maze[i].length; j++) {
-            let s = ""
+            let content = "";
+            let s = "";
 
             if (maze[j][i].includes("t")) {
                 s += "border-top: 1px black solid;";
@@ -63,7 +68,10 @@ connection.on("MapUpdate", function (maze) {
                 s += "border-left: 1px black solid;";
             }
 
-            html += `<td style="${s}"></td>`;
+            if (i == pos[0] && j == pos[1])
+                content = "@";
+
+            html += `<td style="${s}">${content}</td>`;
         }
         html += "</tr>";
     }
@@ -71,6 +79,29 @@ connection.on("MapUpdate", function (maze) {
     html += "</table>";
 
     document.getElementById("map").innerHTML = html;
+
+    //alert(maze[pos[1]][pos[0]])
+
+    document.getElementById("north").disabled = false;
+    document.getElementById("east").disabled = false;
+    document.getElementById("south").disabled = false;
+    document.getElementById("west").disabled = false;
+
+    if (maze[pos[1]][pos[0]].includes("t")) {
+        document.getElementById("north").disabled = true;
+    }
+
+    if (maze[pos[1]][pos[0]].includes("r")) {
+        document.getElementById("east").disabled = true;
+    }
+
+    if (maze[pos[1]][pos[0]].includes("b")) {
+        document.getElementById("south").disabled = true;
+    }
+
+    if (maze[pos[1]][pos[0]].includes("l")) {
+        document.getElementById("west").disabled = true;
+    }
 
 });
 

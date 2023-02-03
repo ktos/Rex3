@@ -134,7 +134,7 @@ namespace MazeGeneration
             Console.WriteLine(firstLine);
         }
 
-        public string CellStateToJson()
+        public string[,] CellStateToStringArray()
         {
             string[,] serializedMaze = new string[_width, _height];
 
@@ -161,7 +161,8 @@ namespace MazeGeneration
                     }
                 }
 
-            return JsonConvert.SerializeObject(serializedMaze);
+            return serializedMaze;
+
         }
     }
 

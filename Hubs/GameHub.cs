@@ -1,5 +1,8 @@
 ﻿using MazeGeneration;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
+using Rex3.Dto;
+using System.Drawing;
 
 namespace Rex3.Hubs
 {
@@ -48,19 +51,33 @@ namespace Rex3.Hubs
 
                 await Clients.All.SendAsync("VoteReceived", user);
 
-                if (_state.Current.IsFinished())
-                {
-                    await Clients.All.SendAsync("VotingFinished", _state.Current.CalculateResult());
-                }
+                //if (_state.Current.IsFinished())
+                //{
+                //    await Clients.All.SendAsync("VotingFinished", _state.Current.CalculateResult());
+                //}
+
+                // tymczasowo, głosowanie zawsze jest udane
+                await Clients.All.SendAsync("VotingFinished", true);
             }
         }
 
         public async Task GameStarted()
         {
             if (_state.Mazes.Count == 0)
+            {
                 _state.Mazes.Add(new Maze(5, 5));
+                _state.CurrentLocation = new Point(0, 0);
+            }
 
-            await Clients.All.SendAsync("MapUpdate", _state.Mazes.First().CellStateToJson());
+            var ms = new MapState
+            {
+                Cells = _state.Mazes.First().CellStateToStringArray(),
+                X = _state.CurrentLocation.X,
+                Y = _state.CurrentLocation.Y
+            };
+            var serializedMs = JsonConvert.SerializeObject(ms);
+
+            await Clients.All.SendAsync("MapUpdate", serializedMs);
         }
 
         public async Task Debug(string user, string message)

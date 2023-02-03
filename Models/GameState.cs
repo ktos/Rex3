@@ -1,4 +1,5 @@
 ﻿using MazeGeneration;
+using System.Drawing;
 
 namespace Rex3
 {
@@ -7,6 +8,8 @@ namespace Rex3
         public List<Voting> VotingHistory { get; set; } = new List<Voting>();
         public Voting? Current { get; set; } = null;
         public List<Maze> Mazes { get; set; } = new List<Maze>();
+
+        public Point CurrentLocation { get; set; }
     }
 
     public class Voting
