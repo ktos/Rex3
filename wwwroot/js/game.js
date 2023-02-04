@@ -160,17 +160,19 @@ connection.on("MapUpdate", function (state) {
 });
 
 connection.on("Win", function (mystery) {
+    console.log(mystery)
     let m = JSON.parse(mystery)
 
-    document.querySelector("#win > h2").textContent = m.Mystery;
+    document.querySelector("#win > h2").textContent = m;
     document.getElementById("win").style.display = '';
     document.getElementById("main").style.display = 'none';
 });
 
 connection.on("Lose", function (mystery) {
+    console.log(mystery)
     let m = JSON.parse(mystery)
 
-    document.querySelector("#lose > h2").textContent = m.Mystery;
+    document.querySelector("#lose > h2").textContent = m;
     document.getElementById("lose").style.display = '';
     document.getElementById("main").style.display = 'none';
 });

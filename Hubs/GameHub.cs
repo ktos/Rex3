@@ -43,6 +43,8 @@ namespace Rex3.Hubs
                 _state.CurrentLevel.EnergyRecoveryAmount = 3;
 
                 _state.CurrentLevel.ClairvoyantGoal = SecretGoal.None;
+                _state.CurrentLevel.NavigatorGoal = SecretGoal.None;
+                _state.CurrentLevel.ScribeGoal = SecretGoal.None;
 
                 GenerateEnemies(3, 3);
                 GenerateBoxes(3, 2, 2);
@@ -319,23 +321,20 @@ namespace Rex3.Hubs
 
         private async Task SendWin()
         {
-            var fs = new FinishState
-            {
-                Mystery = Mysteries.GenerateMystery(_state.CurrentLevel, _state.CurrentLevelIndex)
-            };
-            await Clients.All.SendAsync("Win", JsonConvert.SerializeObject(fs));
+            var mysteries = new List<string>();
+            for (int i = 0; i <= _state.CurrentLevelIndex; i++)
+                mysteries.Add(Mysteries.GenerateMystery(_state.Levels[i], i));
+
+            await Clients.All.SendAsync("Win", JsonConvert.SerializeObject(mysteries));
         }
 
         private async Task SendLose()
         {
-            var fs = new FinishState
-            {
-                Mystery = Mysteries.GenerateLoseMystery(
-                    _state.CurrentLevel,
-                    _state.CurrentLevelIndex
-                )
-            };
-            await Clients.All.SendAsync("Lose", JsonConvert.SerializeObject(fs));
+            var mysteries = new List<string>();
+            for (int i = 0; i <= _state.CurrentLevelIndex; i++)
+                mysteries.Add(Mysteries.GenerateLoseMystery(_state.Levels[i], i));
+
+            await Clients.All.SendAsync("Lose", JsonConvert.SerializeObject(mysteries));
         }
 
         private void ArchiveVoting()
@@ -404,6 +403,7 @@ namespace Rex3.Hubs
                 ms.Cells[item.Position.X, item.Position.Y] += "e" + item.HP;
             }
 
+            // serializing boxes
             foreach (var item in _state.CurrentLevel.Boxes)
             {
                 ms.Cells[item.Position.X, item.Position.Y] += "x";
@@ -411,6 +411,7 @@ namespace Rex3.Hubs
 
             var serializedMs = JsonConvert.SerializeObject(ms);
 
+            // sending update
             await Clients.All.SendAsync("MapUpdate", serializedMs);
         }
 
