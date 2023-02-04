@@ -44,6 +44,7 @@ connection.on("VotingInconclusive", function () {
 
 connection.on("MapUpdate", function (state) {
     let parsed = JSON.parse(state)
+    console.log(parsed)
 
     let maze = parsed["Cells"];
     let pos = [parsed["X"], parsed["Y"]]
@@ -62,20 +63,22 @@ connection.on("MapUpdate", function (state) {
             let content = "";
             let s = "";
 
-            if (maze[j][i].includes("t")) {
-                s += "border-top: 1px black solid;";
-            }
+            if (maze[j][i].includes("v")) {
+                if (maze[j][i].includes("t")) {
+                    s += "border-top: 1px black solid;";
+                }
 
-            if (maze[j][i].includes("r")) {
-                s += "border-right: 1px black solid;";
-            }
+                if (maze[j][i].includes("r")) {
+                    s += "border-right: 1px black solid;";
+                }
 
-            if (maze[j][i].includes("b")) {
-                s += "border-bottom: 1px black solid;";
-            }
+                if (maze[j][i].includes("b")) {
+                    s += "border-bottom: 1px black solid;";
+                }
 
-            if (maze[j][i].includes("l")) {
-                s += "border-left: 1px black solid;";
+                if (maze[j][i].includes("l")) {
+                    s += "border-left: 1px black solid;";
+                }
             }
 
             if (i == pos[0] && j == pos[1])

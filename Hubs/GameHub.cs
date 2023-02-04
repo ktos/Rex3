@@ -64,7 +64,8 @@ namespace Rex3.Hubs
                         _state.Current.Navigator = decision;
                         break;
                     case "scribe":
-                        _state.Current.Scribe = decision; break;
+                        _state.Current.Scribe = decision;
+                        break;
                 }
 
                 await Clients.All.SendAsync("VoteReceived", user);
@@ -73,7 +74,6 @@ namespace Rex3.Hubs
                 //if (_state.Current.IsFinished())
                 if (true)
                 {
-
                     await Clients.All.SendAsync("VotingFinished", true);
 
                     switch (_state.Current.Action)
@@ -104,6 +104,12 @@ namespace Rex3.Hubs
                             break;
                     }
 
+                    // marks current cell as visited
+                    _state.Mazes[_state.CurrentLevel].Visited[
+                        _state.CurrentLocation.Y,
+                        _state.CurrentLocation.X
+                    ] = true;
+
                     // archiving of the votes
                     ArchiveVoting();
 
@@ -113,8 +119,6 @@ namespace Rex3.Hubs
 
                     await SendUpdatedState();
                 }
-
-
             }
         }
 
@@ -132,10 +136,7 @@ namespace Rex3.Hubs
             }
         }
 
-        private async Task MoveEnemies()
-        {
-            
-        }
+        private async Task MoveEnemies() { }
 
         public async Task GameStarted()
         {
@@ -143,6 +144,7 @@ namespace Rex3.Hubs
             {
                 _state.Mazes.Add(new Maze(5, 5));
                 _state.CurrentLocation = new Point(0, 0);
+                _state.Mazes[_state.CurrentLevel].Visited[0, 0] = true;
             }
 
             await SendUpdatedState();
@@ -152,14 +154,15 @@ namespace Rex3.Hubs
         {
             var ms = new MapState
             {
-                Cells = _state.Mazes.First().CellStateToStringArray(),
+                Cells = _state.Mazes[_state.CurrentLevel].CellStateToStringArray(),
                 X = _state.CurrentLocation.X,
                 Y = _state.CurrentLocation.Y,
                 HP = _state.HP,
                 Energy = _state.Energy,
                 Turn = _state.Turn,
                 VotingHistory = _state.VotingHistory.Select(x => x.CalculateResult()).ToList(),
-                Level = _state.Levels[_state.CurrentLevel]
+                Level = _state.Levels[_state.CurrentLevel],
+                Visited = _state.Mazes[_state.CurrentLevel].Visited
             };
             var serializedMs = JsonConvert.SerializeObject(ms);
 

@@ -49,6 +49,7 @@ namespace MazeGeneration
     public class Maze
     {
         private readonly CellState[,] _cells;
+        public bool[,] Visited { get; set; }
         private readonly int _width;
         private readonly int _height;
         private readonly Random _rng;
@@ -63,6 +64,8 @@ namespace MazeGeneration
                     _cells[x, y] = CellState.Initial;
             _rng = new Random();
             VisitCell(_rng.Next(width), _rng.Next(height));
+
+            Visited = new bool[width, height];
         }
 
         public CellState this[int x, int y]
@@ -159,10 +162,12 @@ namespace MazeGeneration
                     {
                         serializedMaze[x, y] += 'l';
                     }
+
+                    if (Visited[x, y])
+                        serializedMaze[x, y] += 'v';
                 }
 
             return serializedMaze;
-
         }
     }
 
