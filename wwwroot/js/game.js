@@ -54,6 +54,7 @@ connection.on("MapUpdate", function (state) {
     let hp = parsed["HP"]
     let energy = parsed["Energy"]
     let energyRecovery = parsed.Level.EnergyRecoveryRate
+    let energyRecoveryAmount = parsed.Level.EnergyRecoveryAmount
     let turn = parsed["Turn"]
     let votingHistory = parsed["VotingHistory"]
     let secret = parsed.Level.ClairvoyantGoal
@@ -86,6 +87,10 @@ connection.on("MapUpdate", function (state) {
 
             if (maze[j][i].includes("s") && currentUser == "navigator") {
                 content = "🧱";
+            }
+
+            if (maze[j][i].includes("e") && currentUser == "clairvoyant") {
+                content = "👾";
             }
 
             if (i == pos[1] && j == pos[0])
@@ -131,7 +136,12 @@ connection.on("MapUpdate", function (state) {
     }
 
     document.getElementById('votinghistory').textContent = votingHistory;
-    document.getElementById('scribe').textContent = `HP: ${hp}, Energy: ${energy} ${energyRecovery}, Turn: ${turn}`;
+    document.getElementById('scribe').textContent = `HP: ${hp}, Energy: ${energy} (recovers ${energyRecoveryAmount} every ${energyRecovery} turns), Turn: ${turn}`;
+    if (currentUser != "scribe")
+        document.getElementById("scribe").style.display = 'none';
+    else
+        document.getElementById("scribe").style.display = '';
+
 
     document.getElementById('secret').textContent = secret;
 

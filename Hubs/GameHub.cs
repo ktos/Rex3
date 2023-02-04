@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using Rex3.Dto;
+using Rex3.Models;
 using System.Drawing;
 
 namespace Rex3.Hubs
@@ -25,6 +26,8 @@ namespace Rex3.Hubs
                 _state.CurrentLocation = new Point(0, 0);
                 _state.Mazes[_state.CurrentLevelIndex].Visited[0, 0] = true;
 
+                _state.Levels.Add(new Level());
+
                 //_state.CurrentLevel.StairsLocation
 
                 var x = rnd.Next(_state.CurrentMaze.Width - 1);
@@ -36,6 +39,23 @@ namespace Rex3.Hubs
                 _state.Energy = 5;
 
                 _state.CurrentMaze.Display();
+
+                _state.CurrentLevel.EnergyRecoveryRate = 3;
+                _state.CurrentLevel.EnergyRecoveryAmount = 3;
+
+                for (int i = 0; i < 5; i++)
+                {
+                    _state.CurrentLevel.Enemies.Add(
+                        new Enemy()
+                        {
+                            HP = 3,
+                            Position = new Point(
+                                rnd.Next(2, _state.CurrentMaze.Width - 1),
+                                rnd.Next(1, _state.CurrentMaze.Height - 1)
+                            )
+                        }
+                    );
+                }
             }
             else
             {
@@ -153,11 +173,11 @@ namespace Rex3.Hubs
                     UpdateEnergy();
                     MoveEnemies();
 
-                    Console.WriteLine(
-                        "loc: {0} {1}",
-                        _state.CurrentLocation,
-                        _state.CurrentLevel.StairsLocation
-                    );
+                    // Console.WriteLine(
+                    //     "loc: {0} {1}",
+                    //     _state.CurrentLocation,
+                    //     _state.CurrentLevel.StairsLocation
+                    // );
                     if (_state.CurrentLocation == _state.CurrentLevel.StairsLocation)
                     {
                         await SendWin();
@@ -196,7 +216,7 @@ namespace Rex3.Hubs
         {
             if (_state.Turn % _state.Levels[_state.CurrentLevelIndex].EnergyRecoveryRate == 0)
             {
-                _state.Energy++;
+                _state.Energy += _state.CurrentLevel.EnergyRecoveryAmount;
             }
         }
 
@@ -230,6 +250,12 @@ namespace Rex3.Hubs
                 _state.Levels[_state.CurrentLevelIndex].StairsLocation.Y
             ] += "s";
 
+            // serializing enemies
+            foreach (var item in _state.CurrentLevel.Enemies)
+            {
+                ms.Cells[item.Position.X, item.Position.Y] += 'e';
+            }
+
             var serializedMs = JsonConvert.SerializeObject(ms);
 
             await Clients.All.SendAsync("MapUpdate", serializedMs);
@@ -245,6 +271,11 @@ namespace Rex3.Hubs
             if (message == "hit")
             {
                 _state.HP--;
+                await this.SendUpdatedState();
+            }
+
+            if (message == "update")
+            {
                 await this.SendUpdatedState();
             }
             //await Clients.All.SendAsync("Receive", user, message);

@@ -27,8 +27,6 @@ namespace Rex3
             VotingHistory = new List<Voting>();
             Mazes = new List<Maze>();
             Levels = new List<Level>();
-
-            Levels.Add(new Level { EnergyRecoveryRate = 3 });
         }
     }
 
