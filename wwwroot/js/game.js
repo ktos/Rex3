@@ -2,7 +2,10 @@
 
 let connection = new signalR.HubConnectionBuilder().withUrl("/game-hub").build();
 
+let currentUser = "";
+
 const votingPanel = document.getElementById("voting");
+document.getElementById("main").style.display = 'none';
 
 function hideVoting() {
     votingPanel.style.display = 'none';
@@ -28,7 +31,6 @@ connection.on("VotingStarted", function (user, action) {
 
 connection.on("VoteReceived", function (user) {
     debug("vote received");
-    let currentUser = document.getElementById("userInput").value;
 
     if (user === currentUser) { hideVoting(); }
 });
@@ -36,7 +38,6 @@ connection.on("VoteReceived", function (user) {
 connection.on("VotingFinished", function (result) {
     debug("voting finished")
     hideVoting();
-    //alert("voting finished " + result);
 });
 
 connection.on("VotingInconclusive", function () {
@@ -44,8 +45,12 @@ connection.on("VotingInconclusive", function () {
     debug("voting inconclusive, you die");
 });
 
+connection.on("GameStarted", function () {
+    document.getElementById('role').style.display = 'none';
+    document.getElementById('main').style.display = '';
+});
+
 connection.on("MapUpdate", function (state) {
-    let currentUser = document.getElementById("userInput").value;
     let parsed = JSON.parse(state)
     console.log(parsed)
 
@@ -95,7 +100,6 @@ connection.on("MapUpdate", function (state) {
             }
 
             if (maze[j][i].includes("x") && currentUser == "navigator") {
-                //let enemy = maze[j][i].substr(maze[j][i].indexOf("e") + 1, 1);
                 content = `🎁`;
             }
 
@@ -166,6 +170,10 @@ connection.on("Lose", function () {
     document.getElementById("main").style.display = 'none';
 });
 
+connection.on("RoleSelected", function (role) {
+    document.querySelector("#role button#b" + role).disabled = true;
+});
+
 connection.start().then(function () {
     //document.getElementById("sendButton").disabled = false;
 }).catch(function (err) {
@@ -206,6 +214,17 @@ document.querySelectorAll("#debug > button").forEach(x => x.addEventListener("cl
     let action = e.target.innerText;
 
     connection.invoke("Debug", user, action).catch(function (err) {
+        return console.error(err.toString());
+    });
+    e.preventDefault();
+}));
+
+document.querySelectorAll("#role > button").forEach(x => x.addEventListener("click", function (e) {
+    let action = e.target.id.substr(1);
+    currentUser = action;
+
+    document.querySelectorAll("#role button").forEach(x => x.disabled = true);
+    connection.invoke("SetRole", action).catch(function (err) {
         return console.error(err.toString());
     });
     e.preventDefault();

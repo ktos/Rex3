@@ -13,6 +13,8 @@ namespace Rex3
         public List<Level> Levels { get; set; }
         public int CurrentLevelIndex { get; set; }
 
+        public int SelectedRolesCount { get; set; }
+
         public Level CurrentLevel => Levels[CurrentLevelIndex];
         public Maze CurrentMaze => Mazes[CurrentLevelIndex];
 

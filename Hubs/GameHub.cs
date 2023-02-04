@@ -306,8 +306,22 @@ namespace Rex3.Hubs
         public async Task GameStarted()
         {
             NextLevel();
-
+            await Clients.All.SendAsync("GameStarted");
             await SendUpdatedState();
+        }
+
+        public async Task SetRole(string role)
+        {
+            _state.SelectedRolesCount++;
+
+            if (_state.SelectedRolesCount == 3)
+            {
+                await GameStarted();
+            }
+            else
+            {
+                await Clients.All.SendAsync("RoleSelected", role);
+            }
         }
 
         public async Task SendUpdatedState()
