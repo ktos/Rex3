@@ -69,32 +69,23 @@ namespace Rex3.Hubs
 
             _state.Current = new Voting() { Action = ac };
             await Clients.All.SendAsync("VotingStarted", user, _state.Current.Action);
-
-            //Task.St
-
-            //Task.Run(async () => {
-            //    await Task.Delay(TimeSpan.FromSeconds(10));
-            //    if (!_state.Current.IsFinished())
-            //    {
-            //        await Clients.All.SendAsync("VotingInconclusive");
-            //    }
-            //});
         }
 
         public async Task VotingTimeout(string user)
         {
             if (_state.Current != null && !_state.Current.IsFinished())
             {
-                _state.InconclusiveCount++;
                 ArchiveVoting();
+                _state.BadVotesCount++;
+
                 await Clients.All.SendAsync("VotingInconclusive");
 
-                if (_state.InconclusiveCount == 2)
+                if (_state.BadVotesCount >= 2)
                 {
                     _state.HP--;
-                    _state.InconclusiveCount = 0;
-                    await SendUpdatedState();
+                    _state.BadVotesCount = 0;
                 }
+                await SendUpdatedState();
             }
         }
 
@@ -125,46 +116,70 @@ namespace Rex3.Hubs
                 {
                     await Clients.All.SendAsync("VotingFinished", true);
 
-                    if (_state.Energy > 0)
+                    //var votingResult = _state.Current.CalculateResult();
+                    //if (votingResult.HasValue && votingResult.Value)
+                    if (true)
                     {
-                        switch (_state.Current.Action)
+                        if (_state.Energy > 0)
                         {
-                            case Action.North:
-                                _state.CurrentLocation = new Point(
-                                    _state.CurrentLocation.X,
-                                    _state.CurrentLocation.Y - 1
-                                );
-                                _state.Energy--;
-                                break;
-                            case Action.East:
-                                _state.CurrentLocation = new Point(
-                                    _state.CurrentLocation.X + 1,
-                                    _state.CurrentLocation.Y
-                                );
-                                _state.Energy--;
-                                break;
-                            case Action.West:
-                                _state.CurrentLocation = new Point(
-                                    _state.CurrentLocation.X - 1,
-                                    _state.CurrentLocation.Y
-                                );
-                                _state.Energy--;
-                                break;
-                            case Action.South:
-                                _state.CurrentLocation = new Point(
-                                    _state.CurrentLocation.X,
-                                    _state.CurrentLocation.Y + 1
-                                );
-                                _state.Energy--;
-                                break;
+                            switch (_state.Current.Action)
+                            {
+                                case Action.North:
+                                    _state.CurrentLocation = new Point(
+                                        _state.CurrentLocation.X,
+                                        _state.CurrentLocation.Y - 1
+                                    );
+                                    _state.Energy--;
+                                    break;
+                                case Action.East:
+                                    _state.CurrentLocation = new Point(
+                                        _state.CurrentLocation.X + 1,
+                                        _state.CurrentLocation.Y
+                                    );
+                                    _state.Energy--;
+                                    break;
+                                case Action.West:
+                                    _state.CurrentLocation = new Point(
+                                        _state.CurrentLocation.X - 1,
+                                        _state.CurrentLocation.Y
+                                    );
+                                    _state.Energy--;
+                                    break;
+                                case Action.South:
+                                    _state.CurrentLocation = new Point(
+                                        _state.CurrentLocation.X,
+                                        _state.CurrentLocation.Y + 1
+                                    );
+                                    _state.Energy--;
+                                    break;
+                                case Action.Rest:
+                                    _state.Energy--;
+                                    _state.HP += 1;
+                                    break;
+                            }
+                        }
+
+                        // marks current cell as visited
+                        _state.Mazes[_state.CurrentLevelIndex].Visited[
+                            _state.CurrentLocation.X,
+                            _state.CurrentLocation.Y
+                        ] = true;
+
+                        // resetting BadVotesCount if voting is successful
+                        _state.BadVotesCount = 0;
+                    }
+                    else
+                    {
+                        // voting was not successful
+                        _state.BadVotesCount++;
+
+                        if (_state.BadVotesCount >= 2)
+                        {
+                            _state.HP--;
+                            _state.BadVotesCount = 0;
+                            await SendUpdatedState();
                         }
                     }
-
-                    // marks current cell as visited
-                    _state.Mazes[_state.CurrentLevelIndex].Visited[
-                        _state.CurrentLocation.X,
-                        _state.CurrentLocation.Y
-                    ] = true;
 
                     // archiving of the votes
                     ArchiveVoting();
@@ -173,11 +188,6 @@ namespace Rex3.Hubs
                     UpdateEnergy();
                     MoveEnemies();
 
-                    // Console.WriteLine(
-                    //     "loc: {0} {1}",
-                    //     _state.CurrentLocation,
-                    //     _state.CurrentLevel.StairsLocation
-                    // );
                     if (_state.CurrentLocation == _state.CurrentLevel.StairsLocation)
                     {
                         await SendWin();
@@ -206,7 +216,6 @@ namespace Rex3.Hubs
 
         private void ArchiveVoting()
         {
-            _state.InconclusiveCount = 0;
             if (_state.Current != null)
                 _state.VotingHistory.Add(_state.Current);
             _state.Current = null;
@@ -241,7 +250,8 @@ namespace Rex3.Hubs
                 Turn = _state.Turn,
                 VotingHistory = _state.VotingHistory.Select(x => x.CalculateResult()).ToList(),
                 Level = _state.Levels[_state.CurrentLevelIndex],
-                Visited = _state.Mazes[_state.CurrentLevelIndex].Visited
+                Visited = _state.Mazes[_state.CurrentLevelIndex].Visited,
+                BadVotesCount = _state.BadVotesCount
             };
 
             // serializing stairs location

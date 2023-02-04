@@ -56,7 +56,7 @@ connection.on("MapUpdate", function (state) {
     let energyRecovery = parsed.Level.EnergyRecoveryRate
     let energyRecoveryAmount = parsed.Level.EnergyRecoveryAmount
     let turn = parsed["Turn"]
-    let votingHistory = parsed["VotingHistory"]
+    let votingHistory = "BadVotes: " + parsed.BadVotesCount + ", voting history: " + parsed["VotingHistory"].map(x => (x === null) ? "inconclusive" : x.toString())
     let secret = parsed.Level.ClairvoyantGoal
 
     let html = "<table>";
@@ -143,7 +143,7 @@ connection.on("MapUpdate", function (state) {
         document.getElementById("scribe").style.display = '';
 
 
-    document.getElementById('secret').textContent = secret;
+    document.getElementById('secret').textContent = "Secret goal: " + secret;
 
 });
 

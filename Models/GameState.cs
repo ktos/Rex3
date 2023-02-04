@@ -8,7 +8,7 @@ namespace Rex3
     {
         public List<Voting> VotingHistory { get; set; }
         public Voting? Current { get; set; } = null;
-        public int InconclusiveCount { get; set; } = 0;
+        public int BadVotesCount { get; set; } = 0;
         public List<Maze> Mazes { get; set; }
         public List<Level> Levels { get; set; }
         public int CurrentLevelIndex { get; set; }
@@ -40,17 +40,22 @@ namespace Rex3
 
         public bool IsFinished()
         {
-            return (Clairvoyant.HasValue && Navigator.HasValue); // && Scribe.HasValue);
+            return (Clairvoyant.HasValue && Navigator.HasValue && Scribe.HasValue);
         }
 
         public bool? CalculateResult()
         {
             // depending on the action all of them must agree or only two
 
-            if (!Clairvoyant.HasValue || !Navigator.HasValue) // || !Scribe.HasValue)
+            if (!Clairvoyant.HasValue || !Navigator.HasValue || !Scribe.HasValue)
                 return null;
 
-            if (Clairvoyant.Value && Navigator.Value || Clairvoyant.Value || Navigator.Value) // && Scribe.Value || Scribe.Value && Navigator.Value)
+            if (
+                Clairvoyant.Value && Navigator.Value
+                || Clairvoyant.Value
+                || Navigator.Value && Scribe.Value
+                || Scribe.Value && Navigator.Value
+            )
                 return true;
 
             return false;
