@@ -1,71 +1,289 @@
 ﻿@page
 @model IndexModel
-@{
-    ViewData["Title"] = "Home page";
-}
 
-<div id="win">
-    <h1>You win!</h1>
-    <h2></h2>
-</div>
+<!doctype html>
+<html lang="en">
 
-<div id="lose">
-    <h1>You lose!</h1>
-    <h2></h2>
-</div>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<div id="role">
-    <button id="bclairvoyant">Clairvoyant</button>
-    <button id="bscribe">Scribe</button>
-    <button id="bnavigator">Navigator</button>
-</div>
+    <title>Rex3</title>
+    <meta name="description" content="Rex3 game">
+    <meta name="author" content="RexTeam">
 
-<div id="debug" class="col-6">
-    <button>gamestarted</button>
-    <button>win</button>
-    <button>lose</button>
-    <button>next</button>
-    <button>hit</button>
+    <link rel="icon" href="~/images/favicon.ico">
+    <link rel="icon" href="~/images/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="~/images/apple-touch-icon.png">
 
-    <div id="debug-log"></div>
-</div>
+    <link rel="stylesheet" href="~/css/styles.css">
 
-<div class="container" id="main">
-    <div class="row p-1">
-        <div class="col-6 text-end">
-            <button class="action" data-val="0" id="north">North</button>
-            <button class="action" data-val="1" id="east">East</button>
-            <button class="action" data-val="2" id="west">West</button>
-            <button class="action" data-val="3" id="south">South</button>
-            <button class="action" data-val="4" id="rest">Rest</button>
+</head>
 
-            <button class="action" data-val="5" id="special">Special</button>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <div id="page">
+        <div id="page-header">
+            <header>
+                <h1 id="gametitle">Rex3</h1>
+
+                <nav id="main-nav-top">
+                    <ul>
+                        <li><a href="#gamestart">game</a></li>
+                        <li><a href="#rules">rules</a></li>
+                        <li><a href="#about">about</a></li>
+                    </ul>
+                </nav>
+            </header>
         </div>
 
-        <div id="voting">
-            <p id="action"></p>
-            <button data-val="1">Yes</button>
-            <button data-val="0">No</button>
-        </div>
+        <section id="gamestart">
+            <form id="character-selection">
+                <div class="form-container">
+                    <label>
+                        <input type="radio" name="test" value="ch1" id="bclairvoyant">
+                        <img src="images/portret-template.gif" />
+
+                        <div class="overlay">
+                            <div class="character-description">
+                                <h3>Clairvoyant</h3>
+                                <p>There are many variations of passages of Lorem Ipsum available, but the majority have
+                                    suffered alteration in some form,</p>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label>
+                        <input type="radio" name="test" value="ch2" id="bscribe">
+                        <img src="images/portret-template.gif" />
+
+                        <div class="overlay">
+                            <div class="character-description">
+                                <h3>Scribe</h3>
+                                <p>There are many variations of passages of Lorem Ipsum available, but the majority have
+                                    suffered alteration in some form,</p>
+                            </div>
+                        </div>
+
+                    </label>
+
+                    <label>
+                        <input type="radio" name="test" value="ch3" id="bnavigator">
+                        <img src="images/portret-template.gif" />
+
+                        <div class="overlay">
+                            <div class="character-description">
+                                <h3>Navigator</h3>
+                                <p>There are many variations of passages of Lorem Ipsum available, but the majority have
+                                    suffered alteration in some form,</p>
+                            </div>
+                        </div>
+                    </label>
+
+                </div>
+                <button type="button" disabled id="connection-status">Start Upload</button>
+            </form>
+
+        </section>
+
+        <section id="game" style="display: none">
+            <div id="win">
+                <h1>You win!</h1>
+                <h2></h2>
+            </div>
+
+            <div id="lose">
+                <h1>You lose!</h1>
+                <h2></h2>
+            </div>
+
+            <div id="role">
+                <button id="bclairvoyant">Clairvoyant</button>
+                <button id="bscribe">Scribe</button>
+                <button id="bnavigator">Navigator</button>
+            </div>
+
+            <div id="debug" class="col-6">
+                <button>gamestarted</button>
+                <button>win</button>
+                <button>lose</button>
+                <button>next</button>
+                <button>hit</button>
+
+                <div id="debug-log"></div>
+            </div>
+
+            <div id="main">
+                <button class="action" data-val="0" id="north">North</button>
+                <button class="action" data-val="1" id="east">East</button>
+                <button class="action" data-val="2" id="west">West</button>
+                <button class="action" data-val="3" id="south">South</button>
+                <button class="action" data-val="4" id="rest">Rest</button>
+
+                <button class="action" data-val="5" id="special">Special</button>
+
+
+                <div id="voting">
+                    <p id="action"></p>
+                    <button data-val="1">Yes</button>
+                    <button data-val="0">No</button>
+                </div>
+
+                <div id="map">
+                </div>
+            </div>
+
+
+
+            <div id="votinghistory"></div>
+
+            <div id="secret">
+            </div>
+
+            <div id="scribe">
+
+            </div>
+        </section>
+
+
+        <section id="rules" class="section-description">
+            <h2>Game Rules</h2>
+
+            <article class="broider">
+                <h3>Main Rules</h3>
+                <div class="content">
+
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
+                        the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley
+                        of type and scrambled it to make a type specimen book.</p>
+                    <p>It has survived not only five centuries, but also the leap into electronic typesetting, remaining
+                        essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets
+                        containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus
+                        PageMaker including versions of Lorem Ipsum.</p>
+
+                </div>
+            </article>
+
+            <article class="broider">
+                <h3>Secret Rules</h3>
+                <div class="content">
+
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
+                        the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley
+                        of type and scrambled it to make a type specimen book.</p>
+                    <p>It has survived not only five centuries, but also the leap into electronic typesetting, remaining
+                        essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets
+                        containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus
+                        PageMaker including versions of Lorem Ipsum.</p>
+
+                </div>
+            </article>
+
+        </section>
+
+        <section id="about" class="section-description">
+
+            <h2>About</h2>
+
+            <article class="broider">
+                <h3>Rex series</h3>
+                <div class="content">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
+                    and scrambled it to make a type specimen book. It has survived not only five centuries, but also the
+                    leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s
+                    with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop
+                    publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                </div>
+            </article>
+
+            <article class="broider">
+                <h3>lubjam</h3>
+                <div class="content">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
+                    and scrambled it to make a type specimen book. It has survived not only five centuries, but also the
+                    leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s
+                    with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop
+                    publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                </div>
+            </article>
+
+            <article class="broider">
+                <h3>Authors</h3>
+
+                <div class="content">
+
+                    <ul>
+                        <li>
+                            <p class="name">
+                                <a href="">Marcin Badurowicz</a>
+                            </p>
+                        </li>
+                        <li>
+                            <p class="name">
+                                <a href="">Maryla Maja</a>
+                            </p>
+                        </li>
+                        <li>
+                            <p class="name">
+                                <a href="">Stanisław Skulimowski</a>
+                            </p>
+                        </li>
+                    </ul>
+
+                </div>
+
+            </article>
+
+            <article class="broider">
+
+                <h3>Copy Rights</h3>
+
+                <div class="content">
+
+                    All rights reserved.
+                </div>
+
+            </article>
+
+            <article class="broider">
+
+                <h3>Resources</h3>
+
+                <div class="content">
+
+                    <ul>
+                        <li><a href="https://github.com/josephg/noisejs">perlin noise made by josephg</a></li>
+                        <li><a href="https://codepen.io/Tibixx/pen/bZLGbo">background noise made by Tibix</a></li>
+                        <li><a
+                                href="https://levelup.gitconnected.com/tabbed-interfaces-without-javascript-661bab1eaec8">tabs
+                                without JavaScript by Jason Knight</a></li>
+                    </ul>
+
+                    <ul>
+                        <li><a href="https://www.fontspace.com/absinthelyric-print-font-f30853">Absinthelyric font</a>
+                        </li>
+                    </ul>
+
+                </div>
+
+            </article>
+
+        </section>
+
+
     </div>
-    <div class="row p-1">
-        <div id="map" class="col-6">
-        </div>
-    </div>
+
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/game.js"></script>
+    <script src="~/js/perlin.js"></script>
+    <script src="~/js/scripts.js"></script>
+
+</body>
+
+</html>
 
 
-
-    <div id="votinghistory"></div>
-
-    <div id="secret">
-    </div>
-
-    <div id="scribe">
-
-    </div>
-
-
-
-</div>
-<script src="~/js/signalr/dist/browser/signalr.js"></script>
-<script src="~/js/game.js"></script>

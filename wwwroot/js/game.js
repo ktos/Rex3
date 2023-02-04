@@ -46,7 +46,7 @@ connection.on("VotingInconclusive", function () {
 
 connection.on("GameStarted", function () {
     console.log("game started");
-    document.getElementById('role').style.display = 'none';
+    document.getElementById('character-selection').style.display = 'none';
     document.getElementById('main').style.display = '';
 });
 
@@ -193,11 +193,13 @@ connection.on("Lose", function (mystery) {
 
 connection.on("RoleSelected", function (role) {
     console.log("role selected " + role);
-    document.querySelector("#role button#b" + role).disabled = true;
+    document.querySelector("#character-selection input#b" + role).disabled = true;
+    document.querySelector("#character-selection input#b" + role).classList.add("active");
+    document.getElementById("connection-status").textContent = 'waiting for upload';
 });
 
 connection.start().then(function () {
-    document.getElementById("debug-log").innerHTML = 'connected';
+    document.getElementById("connection-status").textContent = 'connected';
 }).catch(function (err) {
     return console.error(err.toString());
 });
@@ -241,13 +243,13 @@ document.querySelectorAll("#debug > button").forEach(x => x.addEventListener("cl
     e.preventDefault();
 }));
 
-document.querySelectorAll("#role > button").forEach(x => x.addEventListener("click", function (e) {
+document.querySelectorAll("#character-selection input").forEach(x => x.addEventListener("click", function (e) {
     let action = e.target.id.substr(1);
     currentUser = e.target.id.substr(1);
 
     console.log("selected role " + action);
     console.log(currentUser)
-    document.querySelectorAll("#role button").forEach(x => x.disabled = true);
+    document.querySelectorAll("#character-selection input").forEach(x => x.disabled = true);
     connection.invoke("SetRole", action).catch(function (err) {
         return console.error(err.toString());
     });
