@@ -31,6 +31,9 @@ namespace Rex3.Hubs
                 var y = _state.CurrentMaze.Height - 1; //rnd.Next(_state.CurrentMaze.Height - 1);
 
                 _state.CurrentLevel.StairsLocation = new Point(x, y);
+
+                _state.HP = 5;
+                _state.Energy = 5;
             }
             else
             {
@@ -100,32 +103,39 @@ namespace Rex3.Hubs
                 {
                     await Clients.All.SendAsync("VotingFinished", true);
 
-                    switch (_state.Current.Action)
+                    if (_state.Energy > 0)
                     {
-                        case Action.North:
-                            _state.CurrentLocation = new Point(
-                                _state.CurrentLocation.X - 1,
-                                _state.CurrentLocation.Y
-                            );
-                            break;
-                        case Action.East:
-                            _state.CurrentLocation = new Point(
-                                _state.CurrentLocation.X,
-                                _state.CurrentLocation.Y + 1
-                            );
-                            break;
-                        case Action.West:
-                            _state.CurrentLocation = new Point(
-                                _state.CurrentLocation.X,
-                                _state.CurrentLocation.Y - 1
-                            );
-                            break;
-                        case Action.South:
-                            _state.CurrentLocation = new Point(
-                                _state.CurrentLocation.X + 1,
-                                _state.CurrentLocation.Y
-                            );
-                            break;
+                        switch (_state.Current.Action)
+                        {
+                            case Action.North:
+                                _state.CurrentLocation = new Point(
+                                    _state.CurrentLocation.X - 1,
+                                    _state.CurrentLocation.Y
+                                );
+                                _state.Energy--;
+                                break;
+                            case Action.East:
+                                _state.CurrentLocation = new Point(
+                                    _state.CurrentLocation.X,
+                                    _state.CurrentLocation.Y + 1
+                                );
+                                _state.Energy--;
+                                break;
+                            case Action.West:
+                                _state.CurrentLocation = new Point(
+                                    _state.CurrentLocation.X,
+                                    _state.CurrentLocation.Y - 1
+                                );
+                                _state.Energy--;
+                                break;
+                            case Action.South:
+                                _state.CurrentLocation = new Point(
+                                    _state.CurrentLocation.X + 1,
+                                    _state.CurrentLocation.Y
+                                );
+                                _state.Energy--;
+                                break;
+                        }
                     }
 
                     // marks current cell as visited
@@ -141,9 +151,35 @@ namespace Rex3.Hubs
                     UpdateEnergy();
                     MoveEnemies();
 
-                    await SendUpdatedState();
+                    Console.WriteLine(
+                        "loc: {0} {1}",
+                        _state.CurrentLocation,
+                        _state.CurrentLevel.StairsLocation
+                    );
+                    if (_state.CurrentLocation == _state.CurrentLevel.StairsLocation)
+                    {
+                        await SendWin();
+                    }
+                    else if (_state.HP == 0)
+                    {
+                        await SendLose();
+                    }
+                    else
+                    {
+                        await SendUpdatedState();
+                    }
                 }
             }
+        }
+
+        private async Task SendWin()
+        {
+            await Clients.All.SendAsync("Win");
+        }
+
+        private async Task SendLose()
+        {
+            await Clients.All.SendAsync("Lose");
         }
 
         private void ArchiveVoting()
@@ -202,6 +238,12 @@ namespace Rex3.Hubs
             if (message == "gamestarted")
             {
                 await this.GameStarted();
+            }
+
+            if (message == "hit")
+            {
+                _state.HP--;
+                await this.SendUpdatedState();
             }
             //await Clients.All.SendAsync("Receive", user, message);
         }

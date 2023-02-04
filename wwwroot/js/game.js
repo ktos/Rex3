@@ -17,6 +17,8 @@ function debug(msg) {
 }
 
 hideVoting();
+document.getElementById("win").style.display = 'none';
+document.getElementById("lose").style.display = 'none';
 
 connection.on("VotingStarted", function (user, action) {
     debug("voting started for action " + action)
@@ -121,11 +123,28 @@ connection.on("MapUpdate", function (state) {
         document.getElementById("west").disabled = true;
     }
 
+    if (energy == 0) {
+        document.getElementById("north").disabled = true;
+        document.getElementById("east").disabled = true;
+        document.getElementById("south").disabled = true;
+        document.getElementById("west").disabled = true;
+    }
+
     document.getElementById('votinghistory').textContent = votingHistory;
     document.getElementById('scribe').textContent = `HP: ${hp}, Energy: ${energy} ${energyRecovery}, Turn: ${turn}`;
 
     document.getElementById('secret').textContent = secret;
 
+});
+
+connection.on("Win", function () {
+    document.getElementById("win").style.display = '';
+    document.getElementById("main").style.display = 'none';
+});
+
+connection.on("Lose", function () {
+    document.getElementById("lose").style.display = '';
+    document.getElementById("main").style.display = 'none';
 });
 
 connection.start().then(function () {

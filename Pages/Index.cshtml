@@ -4,7 +4,15 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="container">
+<div id="win">
+    <h1>You win!</h1>
+</div>
+
+<div id="lose">
+    <h1>You lose!</h1>
+</div>
+
+<div class="container" id="main">
     <div class="row p-1">
         <div class="col-6 text-end">
             <button class="action" data-val="0" id="north">North</button>
@@ -12,6 +20,12 @@
             <button class="action" data-val="2" id="west">West</button>
             <button class="action" data-val="3" id="south">South</button>
             <button class="action" data-val="4" id="rest">Rest</button>
+        </div>
+
+        <div id="voting">
+            <p id="action"></p>
+            <button data-val="1">Yes</button>
+            <button data-val="0">No</button>
         </div>
     </div>
     <div class="row p-1">
@@ -26,16 +40,13 @@
             </select>
 
             <button>gamestarted</button>
+            <button>hit</button>
 
             <div id="debug-log"></div>
         </div>
     </div>
 
-    <div id="voting">
-        <p id="action"></p>
-        <button data-val="1">Yes</button>
-        <button data-val="0">No</button>
-    </div>
+
 
     <div id="votinghistory"></div>
 
