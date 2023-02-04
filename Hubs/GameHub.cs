@@ -199,9 +199,8 @@ namespace Rex3.Hubs
                 {
                     await Clients.All.SendAsync("VotingFinished", true);
 
-                    //var votingResult = _state.Current.CalculateResult();
-                    //if (votingResult.HasValue && votingResult.Value)
-                    if (true)
+                    var votingResult = _state.Current.CalculateResult();
+                    if (votingResult.HasValue && votingResult.Value)
                     {
                         if (_state.Energy > 0)
                         {
@@ -239,11 +238,18 @@ namespace Rex3.Hubs
                                     _state.Energy--;
                                     _state.HP += 1;
                                     break;
+                                case Action.ChangeEnemiesHp:
+                                    _state.Energy--;
+                                    foreach (var e in _state.CurrentLevel.Enemies)
+                                    {
+                                        e.HP = 1;
+                                    }
+                                    break;
                             }
                         }
 
                         // marks current cell as visited
-                        _state.Mazes[_state.CurrentLevelIndex].Visited[
+                        _state.CurrentMaze.Visited[
                             _state.CurrentLocation.X,
                             _state.CurrentLocation.Y
                         ] = true;
@@ -275,7 +281,7 @@ namespace Rex3.Hubs
 
                     if (_state.CurrentLocation == _state.CurrentLevel.StairsLocation)
                     {
-                        await SendWin();
+                        await NextLevel();
                     }
                     else if (_state.HP == 0)
                     {
@@ -428,6 +434,12 @@ namespace Rex3.Hubs
                 await SendUpdatedState();
             }
 
+            if (message == "hit")
+            {
+                _state.HP--;
+                await SendUpdatedState();
+            }
+
             if (message == "win")
             {
                 await this.SendWin();
@@ -437,7 +449,6 @@ namespace Rex3.Hubs
             {
                 await this.SendLose();
             }
-            //await Clients.All.SendAsync("Receive", user, message);
         }
     }
 }

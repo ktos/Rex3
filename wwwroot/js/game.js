@@ -2,7 +2,7 @@
 
 const goals = ["There is no special goal", "Kill all the enemies"]
 
-let connection = new signalR.HubConnectionBuilder().withUrl("/game-hub").build();
+let connection = new signalR.HubConnectionBuilder().withUrl("/game-hub").withAutomaticReconnect().build();
 
 let currentUser = "";
 
@@ -17,43 +17,41 @@ function showVoting() {
     votingPanel.style.display = 'block';
 }
 
-function debug(msg) {
-    //document.getElementById("debug-log").innerHTML += msg + "<br>";
-}
-
 hideVoting();
 document.getElementById("win").style.display = 'none';
 document.getElementById("lose").style.display = 'none';
 
 connection.on("VotingStarted", function (user, action) {
-    debug("voting started for action " + action)
+    console.log("voting started for action " + action)
 
     showVoting();
 });
 
 connection.on("VoteReceived", function (user) {
-    debug("vote received");
+    console.log("vote received");
 
     if (user === currentUser) { hideVoting(); }
 });
 
 connection.on("VotingFinished", function (result) {
-    debug("voting finished")
+    console.log("voting finished")
     hideVoting();
 });
 
 connection.on("VotingInconclusive", function () {
     hideVoting();
-    debug("voting inconclusive, you die");
+    console.log("voting inconclusive, you die");
 });
 
 connection.on("GameStarted", function () {
+    console.log("game started");
     document.getElementById('role').style.display = 'none';
     document.getElementById('main').style.display = '';
 });
 
 connection.on("MapUpdate", function (state) {
     let parsed = JSON.parse(state)
+    console.log("map update");
     console.log(parsed)
 
     let maze = parsed["Cells"];
@@ -160,6 +158,7 @@ connection.on("MapUpdate", function (state) {
 });
 
 connection.on("Win", function (mystery) {
+    console.log("win");
     console.log(mystery)
     let m = JSON.parse(mystery)
 
@@ -169,6 +168,7 @@ connection.on("Win", function (mystery) {
 });
 
 connection.on("Lose", function (mystery) {
+    console.log("lose");
     console.log(mystery)
     let m = JSON.parse(mystery)
 
@@ -178,11 +178,12 @@ connection.on("Lose", function (mystery) {
 });
 
 connection.on("RoleSelected", function (role) {
+    console.log("role selected " + role);
     document.querySelector("#role button#b" + role).disabled = true;
 });
 
 connection.start().then(function () {
-    //document.getElementById("sendButton").disabled = false;
+    document.getElementById("debug-log").innerHTML = 'connected';
 }).catch(function (err) {
     return console.error(err.toString());
 });
@@ -190,6 +191,7 @@ connection.start().then(function () {
 document.querySelectorAll("button.action").forEach(x => x.addEventListener("click", function (e) {
     let action = e.target.dataset.val;
 
+    console.log("startvoting for " + action);
     // invoking StartVotingForAction
     connection.invoke("StartVotingForAction", currentUser, action).catch(function (err) {
         return console.error(err.toString());
@@ -208,6 +210,7 @@ document.querySelectorAll("button.action").forEach(x => x.addEventListener("clic
 document.querySelectorAll("#voting > button").forEach(x => x.addEventListener("click", function (e) {
     let action = e.target.dataset.val;
 
+    console.log("voting, " + action);
     connection.invoke("Vote", currentUser, action).catch(function (err) {
         return console.error(err.toString());
     });
@@ -217,6 +220,7 @@ document.querySelectorAll("#voting > button").forEach(x => x.addEventListener("c
 document.querySelectorAll("#debug > button").forEach(x => x.addEventListener("click", function (e) {
     let action = e.target.innerText;
 
+    console.log("debug " + action);
     connection.invoke("Debug", currentUser, action).catch(function (err) {
         return console.error(err.toString());
     });
@@ -225,8 +229,10 @@ document.querySelectorAll("#debug > button").forEach(x => x.addEventListener("cl
 
 document.querySelectorAll("#role > button").forEach(x => x.addEventListener("click", function (e) {
     let action = e.target.id.substr(1);
-    currentUser = action;
+    currentUser = e.target.id.substr(1);
 
+    console.log("selected role " + action);
+    console.log(currentUser)
     document.querySelectorAll("#role button").forEach(x => x.disabled = true);
     connection.invoke("SetRole", action).catch(function (err) {
         return console.error(err.toString());
