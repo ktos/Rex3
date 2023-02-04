@@ -204,18 +204,18 @@ namespace Rex3.Hubs
                         // resetting BadVotesCount if voting is successful
                         _state.BadVotesCount = 0;
                     }
-                    else
-                    {
-                        // voting was not successful
-                        _state.BadVotesCount++;
+                    // else
+                    // {
+                    //     // voting was not successful
+                    //     _state.BadVotesCount++;
 
-                        if (_state.BadVotesCount >= 2)
-                        {
-                            _state.HP--;
-                            _state.BadVotesCount = 0;
-                            await SendUpdatedState();
-                        }
-                    }
+                    //     if (_state.BadVotesCount >= 2)
+                    //     {
+                    //         _state.HP--;
+                    //         _state.BadVotesCount = 0;
+                    //         await SendUpdatedState();
+                    //     }
+                    // }
 
                     // archiving of the votes
                     ArchiveVoting();
@@ -274,7 +274,11 @@ namespace Rex3.Hubs
 
         private async Task SendWin()
         {
-            await Clients.All.SendAsync("Win");
+            var fs = new FinishState
+            {
+                Mystery = Mysteries.GenerateMystery(_state.CurrentLevel, _state.CurrentLevelIndex)
+            };
+            await Clients.All.SendAsync("Win", JsonConvert.SerializeObject(fs));
         }
 
         private async Task SendLose()
@@ -360,6 +364,11 @@ namespace Rex3.Hubs
             if (message == "update")
             {
                 await this.SendUpdatedState();
+            }
+
+            if (message == "win")
+            {
+                await this.SendWin();
             }
             //await Clients.All.SendAsync("Receive", user, message);
         }

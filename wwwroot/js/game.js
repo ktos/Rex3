@@ -91,7 +91,7 @@ connection.on("MapUpdate", function (state) {
 
             if (maze[j][i].includes("e") && currentUser == "clairvoyant") {
                 let enemy = maze[j][i].substr(maze[j][i].indexOf("e") + 1, 1);
-                content = `👾<span class="hp">${enemy}`;
+                content = `👾<span class="hp">${enemy}</span><span class="future">${hp - enemy > 0 ? "" : "dead"}</span>`;
             }
 
             if (maze[j][i].includes("x") && currentUser == "navigator") {
@@ -153,7 +153,10 @@ connection.on("MapUpdate", function (state) {
 
 });
 
-connection.on("Win", function () {
+connection.on("Win", function (mystery) {
+    let m = JSON.parse(mystery)
+
+    document.querySelector("#win > h2").textContent = m.Mystery;
     document.getElementById("win").style.display = '';
     document.getElementById("main").style.display = 'none';
 });
