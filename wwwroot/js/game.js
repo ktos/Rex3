@@ -1,6 +1,7 @@
 ﻿"use strict";
 
 const goals = ["There is no special goal", "Kill all the enemies"]
+const specialActions = { 5: "Reduce HP of enemies" }
 
 let connection = new signalR.HubConnectionBuilder().withUrl("/game-hub").withAutomaticReconnect().build();
 
@@ -63,9 +64,10 @@ connection.on("MapUpdate", function (state) {
     let turn = parsed["Turn"]
     let votingHistory = "BadVotes: " + parsed.BadVotesCount + ", voting history: " + parsed["VotingHistory"].map(x => (x === null) ? "inconclusive" : x.toString())
     let secret = goals[parsed.Level[currentUser[0].toUpperCase() + currentUser.substring(1) + "Goal"]]
+    let specialAction = parsed.Level.SpecialAction
 
+    // generate map
     let html = "<table>";
-
     for (let i = 0; i < maze.length; i++) {
         html += "<tr>";
         for (let j = 0; j < maze[i].length; j++) {
@@ -113,10 +115,10 @@ connection.on("MapUpdate", function (state) {
 
     html += "</table>";
 
+    // update map
     document.getElementById("map").innerHTML = html;
 
-    //alert(maze[pos[1]][pos[0]])
-
+    // update buttons
     document.getElementById("north").disabled = false;
     document.getElementById("east").disabled = false;
     document.getElementById("south").disabled = false;
@@ -138,23 +140,35 @@ connection.on("MapUpdate", function (state) {
         document.getElementById("west").disabled = true;
     }
 
+    // update special action
+    document.getElementById("special").disabled = false;
+    document.getElementById("special").dataset.action = specialAction;
+    document.getElementById("special").textContent = specialActions[specialAction];
+    if (parsed.Level.SpecialActionUsed) {
+        document.getElementById("special").disabled = true;
+    }
+
+    // disable buttons if no energy
     if (energy == 0) {
         document.getElementById("north").disabled = true;
         document.getElementById("east").disabled = true;
         document.getElementById("south").disabled = true;
         document.getElementById("west").disabled = true;
+        document.getElementById("special").disabled = true;
     }
 
+    // update voting history
     document.getElementById('votinghistory').textContent = votingHistory;
+
+    // update scribe panel
     document.getElementById('scribe').textContent = `HP: ${hp}, Energy: ${energy} (recovers ${energyRecoveryAmount} every ${energyRecovery} turns), Turn: ${turn}`;
     if (currentUser != "scribe")
         document.getElementById("scribe").style.display = 'none';
     else
         document.getElementById("scribe").style.display = '';
 
-
+    // update secret goal
     document.getElementById('secret').textContent = "Secret goal: " + secret;
-
 });
 
 connection.on("Win", function (mystery) {

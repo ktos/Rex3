@@ -10,7 +10,6 @@ namespace Rex3.Dto
         public int Y { get; set; }
         public int HP { get; set; }
         public int Energy { get; set; }
-
         public List<bool?>? VotingHistory { get; set; }
         public int BadVotesCount { get; set; }
         public int Turn { get; set; }

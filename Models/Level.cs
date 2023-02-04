@@ -14,5 +14,7 @@ namespace Rex3.Models
         public Point StairsLocation { get; set; }
         public List<Enemy> Enemies { get; set; } = new List<Enemy>();
         public List<Box> Boxes { get; set; } = new List<Box>();
+        public Action SpecialAction { get; internal set; }
+        public bool SpecialActionUsed { get; internal set; } = false;
     }
 }

@@ -46,6 +46,8 @@ namespace Rex3.Hubs
                 _state.CurrentLevel.NavigatorGoal = SecretGoal.None;
                 _state.CurrentLevel.ScribeGoal = SecretGoal.None;
 
+                _state.CurrentLevel.SpecialAction = Action.ChangeEnemiesHp;
+
                 GenerateEnemies(3, 3);
                 GenerateBoxes(3, 2, 2);
             }
@@ -244,6 +246,7 @@ namespace Rex3.Hubs
                                     {
                                         e.HP = 1;
                                     }
+                                    _state.CurrentLevel.SpecialActionUsed = true;
                                     break;
                             }
                         }
