@@ -18,9 +18,13 @@ namespace Rex3.Hubs
             rnd = new Random();
         }
 
-        private void NextLevel()
+        private async Task NextLevel()
         {
-            if (_state.Mazes.Count == 0)
+            if (_state.Mazes.Count == 3)
+            {
+                await SendWin();
+            }
+            else if (_state.Mazes.Count == 0)
             {
                 _state.Mazes.Add(new Maze(5, 5));
                 _state.CurrentLocation = new Point(0, 0);
@@ -28,10 +32,7 @@ namespace Rex3.Hubs
 
                 _state.Levels.Add(new Level());
 
-                var x = rnd.Next(_state.CurrentMaze.Width - 1);
-                var y = _state.CurrentMaze.Height - 1; //rnd.Next(_state.CurrentMaze.Height - 1);
-
-                _state.CurrentLevel.StairsLocation = new Point(x, y);
+                GenerateStairs();
 
                 _state.HP = 5;
                 _state.Energy = 5;
@@ -49,7 +50,44 @@ namespace Rex3.Hubs
             else
             {
                 // generate next level depending on the previous result
+
+                // if everything was fast (less than 10 turns)
+                // next map will be bigger
+                int w = (_state.Turn < 10) ? 7 : 5;
+
+                _state.Mazes.Add(new Maze(w, w));
+
+                _state.Levels.Add(new Level());
+                _state.CurrentLevelIndex += 1;
+
+                _state.CurrentLocation = new Point(0, 0);
+                _state.CurrentMaze.Visited[0, 0] = true;
+                _state.CurrentMaze.Display();
+
+                GenerateStairs();
+
+                // if enemies were killed, there will be more
+                if (_state.CurrentLevel.Enemies.Count < _state.CurrentLevel.EnemiesCount)
+                    GenerateEnemies(_state.CurrentLevel.EnemiesCount + 2, 3);
+                else
+                    GenerateEnemies(2, 4);
+
+                GenerateBoxes(3, 2, 2);
+
+                // if players finished with low energy, there will be less
+                _state.CurrentLevel.EnergyRecoveryRate = 3;
+                _state.CurrentLevel.EnergyRecoveryAmount = 3;
+
+                if (_state.Energy < 5)
+                    _state.CurrentLevel.EnergyRecoveryAmount = 1;
             }
+        }
+
+        private void GenerateStairs()
+        {
+            var x = rnd.Next(_state.CurrentMaze.Width - 1);
+            var y = _state.CurrentMaze.Height - 1;
+            _state.CurrentLevel.StairsLocation = new Point(x, y);
         }
 
         private void GenerateBoxes(int count, int hp, int energy)
@@ -319,7 +357,7 @@ namespace Rex3.Hubs
 
         public async Task GameStarted()
         {
-            NextLevel();
+            await NextLevel();
             await Clients.All.SendAsync("GameStarted");
             await SendUpdatedState();
         }
@@ -385,7 +423,7 @@ namespace Rex3.Hubs
 
             if (message == "next")
             {
-                NextLevel();
+                await NextLevel();
                 await SendUpdatedState();
             }
 
