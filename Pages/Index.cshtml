@@ -11,12 +11,21 @@
 
 <div id="lose">
     <h1>You lose!</h1>
+    <h2></h2>
 </div>
 
 <div id="role">
     <button id="bclairvoyant">Clairvoyant</button>
     <button id="bscribe">Scribe</button>
-    <button id="bnavigator">Navigator</button>
+    <button id="navigator">Navigator</button>
+</div>
+
+<div id="debug" class="col-6">
+    <button>gamestarted</button>
+    <button>win</button>
+    <button>lose</button>
+
+    <div id="debug-log"></div>
 </div>
 
 <div class="container" id="main">
@@ -37,21 +46,6 @@
     </div>
     <div class="row p-1">
         <div id="map" class="col-6">
-        </div>
-
-        <div id="debug" class="col-6">
-            <select id="userInput">
-                <option>clairvoyant</option>
-                <option>scribe</option>
-                <option>navigator</option>
-            </select>
-
-            <button>gamestarted</button>
-            <button>hit</button>
-            <button>update</button>
-            <button>win</button>
-
-            <div id="debug-log"></div>
         </div>
     </div>
 

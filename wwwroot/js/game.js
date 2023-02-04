@@ -1,5 +1,7 @@
 ﻿"use strict";
 
+const goals = ["There is no special goal", "Kill all the enemies"]
+
 let connection = new signalR.HubConnectionBuilder().withUrl("/game-hub").build();
 
 let currentUser = "";
@@ -16,7 +18,7 @@ function showVoting() {
 }
 
 function debug(msg) {
-    document.getElementById("debug-log").innerHTML += msg + "<br>";
+    //document.getElementById("debug-log").innerHTML += msg + "<br>";
 }
 
 hideVoting();
@@ -62,7 +64,7 @@ connection.on("MapUpdate", function (state) {
     let energyRecoveryAmount = parsed.Level.EnergyRecoveryAmount
     let turn = parsed["Turn"]
     let votingHistory = "BadVotes: " + parsed.BadVotesCount + ", voting history: " + parsed["VotingHistory"].map(x => (x === null) ? "inconclusive" : x.toString())
-    let secret = parsed.Level.ClairvoyantGoal
+    let secret = goals[parsed.Level[currentUser[0].toUpperCase() + currentUser.substring(1) + "Goal"]]
 
     let html = "<table>";
 
@@ -165,7 +167,10 @@ connection.on("Win", function (mystery) {
     document.getElementById("main").style.display = 'none';
 });
 
-connection.on("Lose", function () {
+connection.on("Lose", function (mystery) {
+    let m = JSON.parse(mystery)
+
+    document.querySelector("#lose > h2").textContent = m.Mystery;
     document.getElementById("lose").style.display = '';
     document.getElementById("main").style.display = 'none';
 });
@@ -181,11 +186,10 @@ connection.start().then(function () {
 });
 
 document.querySelectorAll("button.action").forEach(x => x.addEventListener("click", function (e) {
-    let user = document.getElementById("userInput").value;
     let action = e.target.dataset.val;
 
     // invoking StartVotingForAction
-    connection.invoke("StartVotingForAction", user, action).catch(function (err) {
+    connection.invoke("StartVotingForAction", currentUser, action).catch(function (err) {
         return console.error(err.toString());
     });
 
@@ -200,20 +204,18 @@ document.querySelectorAll("button.action").forEach(x => x.addEventListener("clic
 }));
 
 document.querySelectorAll("#voting > button").forEach(x => x.addEventListener("click", function (e) {
-    let user = document.getElementById("userInput").value;
     let action = e.target.dataset.val;
 
-    connection.invoke("Vote", user, action).catch(function (err) {
+    connection.invoke("Vote", currentUser, action).catch(function (err) {
         return console.error(err.toString());
     });
     e.preventDefault();
 }));
 
 document.querySelectorAll("#debug > button").forEach(x => x.addEventListener("click", function (e) {
-    let user = document.getElementById("userInput").value;
     let action = e.target.innerText;
 
-    connection.invoke("Debug", user, action).catch(function (err) {
+    connection.invoke("Debug", currentUser, action).catch(function (err) {
         return console.error(err.toString());
     });
     e.preventDefault();

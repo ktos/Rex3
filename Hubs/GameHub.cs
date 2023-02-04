@@ -28,8 +28,6 @@ namespace Rex3.Hubs
 
                 _state.Levels.Add(new Level());
 
-                //_state.CurrentLevel.StairsLocation
-
                 var x = rnd.Next(_state.CurrentMaze.Width - 1);
                 var y = _state.CurrentMaze.Height - 1; //rnd.Next(_state.CurrentMaze.Height - 1);
 
@@ -42,60 +40,69 @@ namespace Rex3.Hubs
 
                 _state.CurrentLevel.EnergyRecoveryRate = 3;
                 _state.CurrentLevel.EnergyRecoveryAmount = 3;
-                _state.CurrentLevel.EnemiesCount = 3;
-                _state.CurrentLevel.BoxesCount = 3;
 
-                for (int i = 0; i < _state.CurrentLevel.EnemiesCount; i++)
-                {
-                    int a = rnd.Next(2, _state.CurrentMaze.Width - 1);
-                    int b = rnd.Next(1, _state.CurrentMaze.Height - 1);
+                _state.CurrentLevel.ClairvoyantGoal = SecretGoal.None;
 
-                    while (
-                        _state.CurrentLevel.Enemies.FirstOrDefault(
-                            x => x.Position == new Point(a, b)
-                        ) != null
-                    )
-                    {
-                        a = rnd.Next(2, _state.CurrentMaze.Width - 1);
-                        b = rnd.Next(1, _state.CurrentMaze.Height - 1);
-                    }
-
-                    _state.CurrentLevel.Enemies.Add(
-                        new Enemy() { HP = 3, Position = new Point(a, b) }
-                    );
-                }
-
-                for (int i = 0; i < _state.CurrentLevel.BoxesCount; i++)
-                {
-                    int a = rnd.Next(1, _state.CurrentMaze.Width - 1);
-                    int b = rnd.Next(1, _state.CurrentMaze.Height - 1);
-
-                    while (
-                        _state.CurrentLevel.Enemies.FirstOrDefault(
-                            x => x.Position == new Point(a, b)
-                        ) != null
-                        || _state.CurrentLevel.Boxes.FirstOrDefault(
-                            x => x.Position == new Point(a, b)
-                        ) != null
-                    )
-                    {
-                        a = rnd.Next(2, _state.CurrentMaze.Width - 1);
-                        b = rnd.Next(1, _state.CurrentMaze.Height - 1);
-                    }
-
-                    _state.CurrentLevel.Boxes.Add(
-                        new Box()
-                        {
-                            HP = 2,
-                            Energy = 2,
-                            Position = new Point(a, b)
-                        }
-                    );
-                }
+                GenerateEnemies(3, 3);
+                GenerateBoxes(3, 2, 2);
             }
             else
             {
                 // generate next level depending on the previous result
+            }
+        }
+
+        private void GenerateBoxes(int count, int hp, int energy)
+        {
+            _state.CurrentLevel.BoxesCount = count;
+            for (int i = 0; i < _state.CurrentLevel.BoxesCount; i++)
+            {
+                int a = rnd.Next(1, _state.CurrentMaze.Width - 1);
+                int b = rnd.Next(1, _state.CurrentMaze.Height - 1);
+
+                while (
+                    _state.CurrentLevel.Enemies.FirstOrDefault(x => x.Position == new Point(a, b))
+                        != null
+                    || _state.CurrentLevel.Boxes.FirstOrDefault(x => x.Position == new Point(a, b))
+                        != null
+                )
+                {
+                    a = rnd.Next(2, _state.CurrentMaze.Width - 1);
+                    b = rnd.Next(1, _state.CurrentMaze.Height - 1);
+                }
+
+                _state.CurrentLevel.Boxes.Add(
+                    new Box()
+                    {
+                        HP = hp,
+                        Energy = energy,
+                        Position = new Point(a, b)
+                    }
+                );
+            }
+        }
+
+        private void GenerateEnemies(int count, int hp)
+        {
+            _state.CurrentLevel.EnemiesCount = count;
+
+            for (int i = 0; i < _state.CurrentLevel.EnemiesCount; i++)
+            {
+                int a = rnd.Next(2, _state.CurrentMaze.Width - 1);
+                int b = rnd.Next(1, _state.CurrentMaze.Height - 1);
+
+                while (
+                    _state.CurrentLevel.Enemies.FirstOrDefault(x => x.Position == new Point(a, b))
+                    != null
+                )
+                {
+                    a = rnd.Next(2, _state.CurrentMaze.Width - 1);
+                    b = rnd.Next(1, _state.CurrentMaze.Height - 1);
+                }
+
+                _state.CurrentLevel.Enemies.Add(
+                    new Enemy() { HP = hp, Position = new Point(a, b) }
+                );
             }
         }
 
@@ -283,7 +290,14 @@ namespace Rex3.Hubs
 
         private async Task SendLose()
         {
-            await Clients.All.SendAsync("Lose");
+            var fs = new FinishState
+            {
+                Mystery = Mysteries.GenerateLoseMystery(
+                    _state.CurrentLevel,
+                    _state.CurrentLevelIndex
+                )
+            };
+            await Clients.All.SendAsync("Lose", JsonConvert.SerializeObject(fs));
         }
 
         private void ArchiveVoting()
@@ -369,20 +383,20 @@ namespace Rex3.Hubs
                 await this.GameStarted();
             }
 
-            if (message == "hit")
+            if (message == "next")
             {
-                _state.HP--;
-                await this.SendUpdatedState();
-            }
-
-            if (message == "update")
-            {
-                await this.SendUpdatedState();
+                NextLevel();
+                await SendUpdatedState();
             }
 
             if (message == "win")
             {
                 await this.SendWin();
+            }
+
+            if (message == "lose")
+            {
+                await this.SendLose();
             }
             //await Clients.All.SendAsync("Receive", user, message);
         }
