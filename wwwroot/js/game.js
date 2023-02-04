@@ -90,7 +90,13 @@ connection.on("MapUpdate", function (state) {
             }
 
             if (maze[j][i].includes("e") && currentUser == "clairvoyant") {
-                content = "👾";
+                let enemy = maze[j][i].substr(maze[j][i].indexOf("e") + 1, 1);
+                content = `👾<span class="hp">${enemy}`;
+            }
+
+            if (maze[j][i].includes("x") && currentUser == "navigator") {
+                //let enemy = maze[j][i].substr(maze[j][i].indexOf("e") + 1, 1);
+                content = `🎁`;
             }
 
             if (i == pos[1] && j == pos[0])

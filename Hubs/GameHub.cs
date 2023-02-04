@@ -42,17 +42,53 @@ namespace Rex3.Hubs
 
                 _state.CurrentLevel.EnergyRecoveryRate = 3;
                 _state.CurrentLevel.EnergyRecoveryAmount = 3;
+                _state.CurrentLevel.EnemiesCount = 3;
+                _state.CurrentLevel.BoxesCount = 3;
 
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < _state.CurrentLevel.EnemiesCount; i++)
                 {
+                    int a = rnd.Next(2, _state.CurrentMaze.Width - 1);
+                    int b = rnd.Next(1, _state.CurrentMaze.Height - 1);
+
+                    while (
+                        _state.CurrentLevel.Enemies.FirstOrDefault(
+                            x => x.Position == new Point(a, b)
+                        ) != null
+                    )
+                    {
+                        a = rnd.Next(2, _state.CurrentMaze.Width - 1);
+                        b = rnd.Next(1, _state.CurrentMaze.Height - 1);
+                    }
+
                     _state.CurrentLevel.Enemies.Add(
-                        new Enemy()
+                        new Enemy() { HP = 3, Position = new Point(a, b) }
+                    );
+                }
+
+                for (int i = 0; i < _state.CurrentLevel.BoxesCount; i++)
+                {
+                    int a = rnd.Next(1, _state.CurrentMaze.Width - 1);
+                    int b = rnd.Next(1, _state.CurrentMaze.Height - 1);
+
+                    while (
+                        _state.CurrentLevel.Enemies.FirstOrDefault(
+                            x => x.Position == new Point(a, b)
+                        ) != null
+                        || _state.CurrentLevel.Boxes.FirstOrDefault(
+                            x => x.Position == new Point(a, b)
+                        ) != null
+                    )
+                    {
+                        a = rnd.Next(2, _state.CurrentMaze.Width - 1);
+                        b = rnd.Next(1, _state.CurrentMaze.Height - 1);
+                    }
+
+                    _state.CurrentLevel.Boxes.Add(
+                        new Box()
                         {
-                            HP = 3,
-                            Position = new Point(
-                                rnd.Next(2, _state.CurrentMaze.Width - 1),
-                                rnd.Next(1, _state.CurrentMaze.Height - 1)
-                            )
+                            HP = 2,
+                            Energy = 2,
+                            Position = new Point(a, b)
                         }
                     );
                 }
@@ -185,6 +221,8 @@ namespace Rex3.Hubs
                     ArchiveVoting();
 
                     // update energy, move enemies
+                    await CheckEnemies();
+                    await CheckBoxes();
                     UpdateEnergy();
                     MoveEnemies();
 
@@ -201,6 +239,36 @@ namespace Rex3.Hubs
                         await SendUpdatedState();
                     }
                 }
+            }
+        }
+
+        private async Task CheckEnemies()
+        {
+            var enemyAtCurrentPosition = _state.CurrentLevel.Enemies.FirstOrDefault(
+                x => x.Position == _state.CurrentLocation
+            );
+
+            if (enemyAtCurrentPosition != null)
+            {
+                _state.HP -= enemyAtCurrentPosition.HP;
+                _state.CurrentLevel.Enemies.Remove(enemyAtCurrentPosition);
+                await Clients.All.SendAsync("Attack");
+            }
+        }
+
+        private async Task CheckBoxes()
+        {
+            var boxAtCurrentPosition = _state.CurrentLevel.Boxes.FirstOrDefault(
+                x => x.Position == _state.CurrentLocation
+            );
+
+            if (boxAtCurrentPosition != null)
+            {
+                _state.HP += boxAtCurrentPosition.HP;
+                _state.Energy += boxAtCurrentPosition.Energy;
+                _state.CurrentLevel.Boxes.Remove(boxAtCurrentPosition);
+
+                await Clients.All.SendAsync("Box");
             }
         }
 
@@ -263,7 +331,12 @@ namespace Rex3.Hubs
             // serializing enemies
             foreach (var item in _state.CurrentLevel.Enemies)
             {
-                ms.Cells[item.Position.X, item.Position.Y] += 'e';
+                ms.Cells[item.Position.X, item.Position.Y] += "e" + item.HP;
+            }
+
+            foreach (var item in _state.CurrentLevel.Boxes)
+            {
+                ms.Cells[item.Position.X, item.Position.Y] += "x";
             }
 
             var serializedMs = JsonConvert.SerializeObject(ms);

@@ -5,6 +5,8 @@ namespace Rex3.Models
     public class Level
     {
         public int EnergyRecoveryRate { get; set; }
+        public int EnemiesCount { get; set; }
+        public int BoxesCount { get; set; }
         public int EnergyRecoveryAmount { get; set; }
         public SecretGoals ClairvoyantGoal { get; set; }
         public SecretGoals ScribeGoal { get; set; }
