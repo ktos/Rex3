@@ -8,10 +8,13 @@ namespace Rex3
     {
         public List<Voting> VotingHistory { get; set; }
         public Voting? Current { get; set; } = null;
-        public int Inconclusive { get; set; } = 0;
+        public int InconclusiveCount { get; set; } = 0;
         public List<Maze> Mazes { get; set; }
         public List<Level> Levels { get; set; }
-        public int CurrentLevel { get; set; }
+        public int CurrentLevelIndex { get; set; }
+
+        public Level CurrentLevel => Levels[CurrentLevelIndex];
+        public Maze CurrentMaze => Mazes[CurrentLevelIndex];
 
         public Point CurrentLocation { get; set; }
 
@@ -27,7 +30,6 @@ namespace Rex3
 
             Levels.Add(new Level { EnergyRecoveryRate = 3 });
         }
-
     }
 
     public class Voting
@@ -35,22 +37,22 @@ namespace Rex3
         public Action Action { get; set; }
         public bool? Clairvoyant { get; set; }
         public bool? Navigator { get; set; }
-        
+
         public bool? Scribe { get; set; }
 
         public bool IsFinished()
         {
-            return (Clairvoyant.HasValue && Navigator.HasValue);// && Scribe.HasValue);
+            return (Clairvoyant.HasValue && Navigator.HasValue); // && Scribe.HasValue);
         }
 
         public bool? CalculateResult()
         {
             // depending on the action all of them must agree or only two
 
-            if (!Clairvoyant.HasValue || !Navigator.HasValue)// || !Scribe.HasValue)
+            if (!Clairvoyant.HasValue || !Navigator.HasValue) // || !Scribe.HasValue)
                 return null;
 
-            if (Clairvoyant.Value && Navigator.Value || Clairvoyant.Value || Navigator.Value)// && Scribe.Value || Scribe.Value && Navigator.Value)
+            if (Clairvoyant.Value && Navigator.Value || Clairvoyant.Value || Navigator.Value) // && Scribe.Value || Scribe.Value && Navigator.Value)
                 return true;
 
             return false;

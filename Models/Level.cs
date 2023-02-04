@@ -1,4 +1,6 @@
-﻿namespace Rex3.Models
+﻿using System.Drawing;
+
+namespace Rex3.Models
 {
     public class Level
     {
@@ -6,5 +8,6 @@
         public SecretGoals ClairvoyantGoal { get; set; }
         public SecretGoals ScribeGoal { get; set; }
         public SecretGoals NavigatorGoal { get; set; }
+        public Point StairsLocation { get; set; }
     }
 }

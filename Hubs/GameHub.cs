@@ -9,10 +9,33 @@ namespace Rex3.Hubs
     public class GameHub : Hub
     {
         private readonly GameState _state;
+        private readonly Random rnd;
 
         public GameHub(GameState state)
         {
             _state = state;
+            rnd = new Random();
+        }
+
+        private void NextLevel()
+        {
+            if (_state.Mazes.Count == 0)
+            {
+                _state.Mazes.Add(new Maze(5, 5));
+                _state.CurrentLocation = new Point(0, 0);
+                _state.Mazes[_state.CurrentLevelIndex].Visited[0, 0] = true;
+
+                //_state.CurrentLevel.StairsLocation
+
+                var x = rnd.Next(_state.CurrentMaze.Width - 1);
+                var y = _state.CurrentMaze.Height - 1; //rnd.Next(_state.CurrentMaze.Height - 1);
+
+                _state.CurrentLevel.StairsLocation = new Point(x, y);
+            }
+            else
+            {
+                // generate next level depending on the previous result
+            }
         }
 
         public async Task StartVotingForAction(string user, string action)
@@ -37,13 +60,14 @@ namespace Rex3.Hubs
         {
             if (_state.Current != null && !_state.Current.IsFinished())
             {
-                _state.Inconclusive++;
+                _state.InconclusiveCount++;
                 ArchiveVoting();
                 await Clients.All.SendAsync("VotingInconclusive");
 
-                if (_state.Inconclusive == 2)
+                if (_state.InconclusiveCount == 2)
                 {
                     _state.HP--;
+                    _state.InconclusiveCount = 0;
                     await SendUpdatedState();
                 }
             }
@@ -105,7 +129,7 @@ namespace Rex3.Hubs
                     }
 
                     // marks current cell as visited
-                    _state.Mazes[_state.CurrentLevel].Visited[
+                    _state.Mazes[_state.CurrentLevelIndex].Visited[
                         _state.CurrentLocation.Y,
                         _state.CurrentLocation.X
                     ] = true;
@@ -114,8 +138,8 @@ namespace Rex3.Hubs
                     ArchiveVoting();
 
                     // update energy, move enemies
-                    await UpdateEnergy();
-                    await MoveEnemies();
+                    UpdateEnergy();
+                    MoveEnemies();
 
                     await SendUpdatedState();
                 }
@@ -124,28 +148,25 @@ namespace Rex3.Hubs
 
         private void ArchiveVoting()
         {
-            _state.VotingHistory.Add(_state.Current);
+            _state.InconclusiveCount = 0;
+            if (_state.Current != null)
+                _state.VotingHistory.Add(_state.Current);
             _state.Current = null;
         }
 
-        private async Task UpdateEnergy()
+        private void UpdateEnergy()
         {
-            if (_state.Turn % _state.Levels[_state.CurrentLevel].EnergyRecoveryRate == 0)
+            if (_state.Turn % _state.Levels[_state.CurrentLevelIndex].EnergyRecoveryRate == 0)
             {
                 _state.Energy++;
             }
         }
 
-        private async Task MoveEnemies() { }
+        private void MoveEnemies() { }
 
         public async Task GameStarted()
         {
-            if (_state.Mazes.Count == 0)
-            {
-                _state.Mazes.Add(new Maze(5, 5));
-                _state.CurrentLocation = new Point(0, 0);
-                _state.Mazes[_state.CurrentLevel].Visited[0, 0] = true;
-            }
+            NextLevel();
 
             await SendUpdatedState();
         }
@@ -154,16 +175,23 @@ namespace Rex3.Hubs
         {
             var ms = new MapState
             {
-                Cells = _state.Mazes[_state.CurrentLevel].CellStateToStringArray(),
+                Cells = _state.Mazes[_state.CurrentLevelIndex].CellStateToStringArray(),
                 X = _state.CurrentLocation.X,
                 Y = _state.CurrentLocation.Y,
                 HP = _state.HP,
                 Energy = _state.Energy,
                 Turn = _state.Turn,
                 VotingHistory = _state.VotingHistory.Select(x => x.CalculateResult()).ToList(),
-                Level = _state.Levels[_state.CurrentLevel],
-                Visited = _state.Mazes[_state.CurrentLevel].Visited
+                Level = _state.Levels[_state.CurrentLevelIndex],
+                Visited = _state.Mazes[_state.CurrentLevelIndex].Visited
             };
+
+            // serializing stairs location
+            ms.Cells[
+                _state.Levels[_state.CurrentLevelIndex].StairsLocation.X,
+                _state.Levels[_state.CurrentLevelIndex].StairsLocation.Y
+            ] += "s";
+
             var serializedMs = JsonConvert.SerializeObject(ms);
 
             await Clients.All.SendAsync("MapUpdate", serializedMs);

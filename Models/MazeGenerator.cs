@@ -50,14 +50,14 @@ namespace MazeGeneration
     {
         private readonly CellState[,] _cells;
         public bool[,] Visited { get; set; }
-        private readonly int _width;
-        private readonly int _height;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
         private readonly Random _rng;
 
         public Maze(int width, int height)
         {
-            _width = width;
-            _height = height;
+            Width = width;
+            Height = height;
             _cells = new CellState[width, height];
             for (var x = 0; x < width; x++)
                 for (var y = 0; y < height; y++)
@@ -88,13 +88,13 @@ namespace MazeGeneration
                     Neighbour = new Point(p.X, p.Y - 1),
                     Wall = CellState.Top
                 };
-            if (p.X < _width - 1)
+            if (p.X < Width - 1)
                 yield return new RemoveWallAction
                 {
                     Neighbour = new Point(p.X + 1, p.Y),
                     Wall = CellState.Right
                 };
-            if (p.Y < _height - 1)
+            if (p.Y < Height - 1)
                 yield return new RemoveWallAction
                 {
                     Neighbour = new Point(p.X, p.Y + 1),
@@ -120,11 +120,11 @@ namespace MazeGeneration
         public void Display()
         {
             var firstLine = string.Empty;
-            for (var y = 0; y < _height; y++)
+            for (var y = 0; y < Height; y++)
             {
                 var sbTop = new StringBuilder();
                 var sbMid = new StringBuilder();
-                for (var x = 0; x < _width; x++)
+                for (var x = 0; x < Width; x++)
                 {
                     sbTop.Append(this[x, y].HasFlag(CellState.Top) ? "+---" : "+   ");
                     sbMid.Append(this[x, y].HasFlag(CellState.Left) ? "|   " : "    ");
@@ -139,10 +139,10 @@ namespace MazeGeneration
 
         public string[,] CellStateToStringArray()
         {
-            string[,] serializedMaze = new string[_width, _height];
+            string[,] serializedMaze = new string[Width, Height];
 
-            for (var x = 0; x < _height; x++)
-                for (var y = 0; y < _width; y++)
+            for (var x = 0; x < Height; x++)
+                for (var y = 0; y < Width; y++)
                 {
                     serializedMaze[x, y] = "";
 

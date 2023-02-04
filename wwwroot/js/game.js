@@ -26,9 +26,9 @@ connection.on("VotingStarted", function (user, action) {
 
 connection.on("VoteReceived", function (user) {
     debug("vote received");
-    let user2 = document.getElementById("userInput").value;
+    let currentUser = document.getElementById("userInput").value;
 
-    if (user === user2) { hideVoting(); }
+    if (user === currentUser) { hideVoting(); }
 });
 
 connection.on("VotingFinished", function (result) {
@@ -43,6 +43,7 @@ connection.on("VotingInconclusive", function () {
 });
 
 connection.on("MapUpdate", function (state) {
+    let currentUser = document.getElementById("userInput").value;
     let parsed = JSON.parse(state)
     console.log(parsed)
 
@@ -79,6 +80,10 @@ connection.on("MapUpdate", function (state) {
                 if (maze[j][i].includes("l")) {
                     s += "border-left: 1px black solid;";
                 }
+            }
+
+            if (maze[j][i].includes("s")) {
+                content = "🧱";
             }
 
             if (i == pos[0] && j == pos[1])
@@ -138,12 +143,12 @@ document.querySelectorAll("button.action").forEach(x => x.addEventListener("clic
         return console.error(err.toString());
     });
 
-    // but also invoking timeout function
-    setTimeout(function () {
-        connection.invoke("VotingTimeout", user).catch(function (err) {
-            return console.error(err.toString());
-        });
-    }, 5000);
+    // but also invoking voting timeout function
+    // setTimeout(function () {
+    //     connection.invoke("VotingTimeout", user).catch(function (err) {
+    //         return console.error(err.toString());
+    //     });
+    // }, 5000);
 
     e.preventDefault();
 }));
