@@ -34,6 +34,8 @@ namespace Rex3.Hubs
 
                 _state.HP = 5;
                 _state.Energy = 5;
+
+                _state.CurrentMaze.Display();
             }
             else
             {
@@ -109,29 +111,29 @@ namespace Rex3.Hubs
                         {
                             case Action.North:
                                 _state.CurrentLocation = new Point(
-                                    _state.CurrentLocation.X - 1,
-                                    _state.CurrentLocation.Y
-                                );
-                                _state.Energy--;
-                                break;
-                            case Action.East:
-                                _state.CurrentLocation = new Point(
-                                    _state.CurrentLocation.X,
-                                    _state.CurrentLocation.Y + 1
-                                );
-                                _state.Energy--;
-                                break;
-                            case Action.West:
-                                _state.CurrentLocation = new Point(
                                     _state.CurrentLocation.X,
                                     _state.CurrentLocation.Y - 1
                                 );
                                 _state.Energy--;
                                 break;
-                            case Action.South:
+                            case Action.East:
                                 _state.CurrentLocation = new Point(
                                     _state.CurrentLocation.X + 1,
                                     _state.CurrentLocation.Y
+                                );
+                                _state.Energy--;
+                                break;
+                            case Action.West:
+                                _state.CurrentLocation = new Point(
+                                    _state.CurrentLocation.X - 1,
+                                    _state.CurrentLocation.Y
+                                );
+                                _state.Energy--;
+                                break;
+                            case Action.South:
+                                _state.CurrentLocation = new Point(
+                                    _state.CurrentLocation.X,
+                                    _state.CurrentLocation.Y + 1
                                 );
                                 _state.Energy--;
                                 break;
@@ -140,8 +142,8 @@ namespace Rex3.Hubs
 
                     // marks current cell as visited
                     _state.Mazes[_state.CurrentLevelIndex].Visited[
-                        _state.CurrentLocation.Y,
-                        _state.CurrentLocation.X
+                        _state.CurrentLocation.X,
+                        _state.CurrentLocation.Y
                     ] = true;
 
                     // archiving of the votes

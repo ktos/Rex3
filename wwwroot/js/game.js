@@ -88,7 +88,7 @@ connection.on("MapUpdate", function (state) {
                 content = "🧱";
             }
 
-            if (i == pos[0] && j == pos[1])
+            if (i == pos[1] && j == pos[0])
                 content = "@";
 
             html += `<td style="${s}">${content}</td>`;
@@ -107,19 +107,19 @@ connection.on("MapUpdate", function (state) {
     document.getElementById("south").disabled = false;
     document.getElementById("west").disabled = false;
 
-    if (maze[pos[1]][pos[0]].includes("t")) {
+    if (maze[pos[0]][pos[1]].includes("t")) {
         document.getElementById("north").disabled = true;
     }
 
-    if (maze[pos[1]][pos[0]].includes("r")) {
+    if (maze[pos[0]][pos[1]].includes("r")) {
         document.getElementById("east").disabled = true;
     }
 
-    if (maze[pos[1]][pos[0]].includes("b")) {
+    if (maze[pos[0]][pos[1]].includes("b")) {
         document.getElementById("south").disabled = true;
     }
 
-    if (maze[pos[1]][pos[0]].includes("l")) {
+    if (maze[pos[0]][pos[1]].includes("l")) {
         document.getElementById("west").disabled = true;
     }
 

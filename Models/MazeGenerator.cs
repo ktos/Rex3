@@ -141,8 +141,8 @@ namespace MazeGeneration
         {
             string[,] serializedMaze = new string[Width, Height];
 
-            for (var x = 0; x < Height; x++)
-                for (var y = 0; y < Width; y++)
+            for (var y = 0; y < Height; y++)
+                for (var x = 0; x < Width; x++)
                 {
                     serializedMaze[x, y] = "";
 
