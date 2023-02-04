@@ -84,12 +84,12 @@ connection.on("MapUpdate", function (state) {
                 }
             }
 
-            if (maze[j][i].includes("s")) {
+            if (maze[j][i].includes("s") && currentUser == "navigator") {
                 content = "🧱";
             }
 
             if (i == pos[1] && j == pos[0])
-                content = "@";
+                content = "🤖";
 
             html += `<td style="${s}">${content}</td>`;
         }
