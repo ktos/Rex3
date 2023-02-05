@@ -276,6 +276,22 @@ document.querySelectorAll("#character-selection input").forEach(x => x.addEventL
     let action = e.target.id.substr(1);
     currentUser = e.target.id.substr(1);
 
+    if (currentUser == "scribe") {
+        document.querySelector(".right-container .main-portret").src = 'images/character_1.PNG';
+        document.querySelector(".left-container #other-portret1").src = 'images/character_2.PNG';
+        document.querySelector(".left-container #other-portret2").src = 'images/character_3.PNG';
+    } else if (currentUser == "navigator") {
+        document.querySelector(".right-container .main-portret").src = 'images/character_3.PNG';
+        document.querySelector(".left-container #other-portret1").src = 'images/character_1.PNG';
+        document.querySelector(".left-container #other-portret2").src = 'images/character_2.PNG';
+    }
+    else {
+        document.querySelector(".right-container .main-portret").src = 'images/character_2.PNG';
+        document.querySelector(".left-container #other-portret1").src = 'images/character_1.PNG';
+        document.querySelector(".left-container #other-portret2").src = 'images/character_3.PNG';
+    }
+
+
     console.log("selected role " + action);
     console.log(currentUser)
     document.querySelectorAll("#character-selection input").forEach(x => x.disabled = true);
