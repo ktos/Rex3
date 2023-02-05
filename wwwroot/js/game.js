@@ -8,7 +8,6 @@ let connection = new signalR.HubConnectionBuilder().withUrl("/game-hub").withAut
 let currentUser = "";
 
 const votingPanel = document.getElementById("voting");
-document.getElementById("main").style.display = 'none';
 
 function hideVoting() {
     votingPanel.style.display = 'none';
@@ -21,6 +20,7 @@ function showVoting() {
 hideVoting();
 document.getElementById("win").style.display = 'none';
 document.getElementById("lose").style.display = 'none';
+document.getElementById("game").style.display = 'none';
 
 connection.on("VotingStarted", function (user, action) {
     console.log("voting started for action " + action)
@@ -47,7 +47,7 @@ connection.on("VotingInconclusive", function () {
 connection.on("GameStarted", function () {
     console.log("game started");
     document.getElementById('character-selection').style.display = 'none';
-    document.getElementById('main').style.display = '';
+    document.getElementById('game').style.display = '';
 });
 
 connection.on("MapUpdate", function (state) {
@@ -67,56 +67,77 @@ connection.on("MapUpdate", function (state) {
     let specialAction = parsed.Level.SpecialAction
 
     // generate map
-    let html = "<table>";
+    let html = "<table id='main-map'>";
     for (let i = 0; i < maze.length; i++) {
         html += "<tr>";
         for (let j = 0; j < maze[i].length; j++) {
             let content = "";
-            let s = "";
+            let s = [];
 
             if (maze[j][i].includes("v")) {
+
+                if (maze[j][i].includes("l")) {
+                    s.push("left");
+                }
+
                 if (maze[j][i].includes("t")) {
-                    s += "border-top: 1px black solid;";
+                    s.push("top");
                 }
 
                 if (maze[j][i].includes("r")) {
-                    s += "border-right: 1px black solid;";
+                    s.push("right");
                 }
 
                 if (maze[j][i].includes("b")) {
-                    s += "border-bottom: 1px black solid;";
-                }
-
-                if (maze[j][i].includes("l")) {
-                    s += "border-left: 1px black solid;";
+                    s.push("bottom");
                 }
             }
+            else
+                s.push("hidden");
+
+            let cl = "background_" + s.join("_");
+
+            if (cl == "background_") cl = "background_hidden";
 
             if (maze[j][i].includes("s") && currentUser == "navigator") {
-                content = "🧱";
+                content = `<div class="element endpoint"></div>`;
             }
 
             if (maze[j][i].includes("e") && currentUser == "clairvoyant") {
                 let enemy = maze[j][i].substr(maze[j][i].indexOf("e") + 1, 1);
-                content = `👾<span class="hp">${enemy}</span><span class="future">${hp - enemy > 0 ? "" : "dead"}</span>`;
+                content = `<div class="element enemy"><span class="enemy-hp">${enemy}</span><span class="future">${hp - enemy > 0 ? "" : "dead"}</span></div>`;
             }
 
             if (maze[j][i].includes("x") && currentUser == "navigator") {
-                content = `🎁`;
+                content = `<div class="element item"></div>`;
             }
 
             if (i == pos[1] && j == pos[0])
-                content = "🤖";
+                content = `<div class="element player"></div>`;
 
-            html += `<td style="${s}">${content}</td>`;
+            html += `<td class="${cl}">${content}</td>`;
         }
         html += "</tr>";
     }
+    html += '</table>';
 
-    html += "</table>";
+    /*
+    <td class="background_hidden">
+                            <div class="element player"></div>
+                        </td>
+                        <td class="background_hidden">
+                            <div class="element enemy"></div>
+                        </td>
+                        <td class="background_hidden">
+                            <div class="element item"></div>
+                        </td>
+                        <td class="background_hidden">
+                            <div class="element endpoint"></div>
+                        </td>
+                        */
 
     // update map
-    document.getElementById("map").innerHTML = html;
+    document.getElementById("game-map").innerHTML = html;
 
     // update buttons
     document.getElementById("north").disabled = false;
@@ -143,7 +164,8 @@ connection.on("MapUpdate", function (state) {
     // update special action
     document.getElementById("special").disabled = false;
     document.getElementById("special").dataset.action = specialAction;
-    document.getElementById("special").textContent = specialActions[specialAction];
+    document.getElementById("special").title = specialActions[specialAction];
+    document.getElementById("special-skill-desc").textContent = "Special skill: " + specialActions[specialAction];
     if (parsed.Level.SpecialActionUsed) {
         document.getElementById("special").disabled = true;
     }
@@ -161,11 +183,18 @@ connection.on("MapUpdate", function (state) {
     document.getElementById('votinghistory').textContent = votingHistory;
 
     // update scribe panel
-    document.getElementById('scribe').textContent = `HP: ${hp}, Energy: ${energy} (recovers ${energyRecoveryAmount} every ${energyRecovery} turns), Turn: ${turn}`;
-    if (currentUser != "scribe")
-        document.getElementById("scribe").style.display = 'none';
-    else
-        document.getElementById("scribe").style.display = '';
+    document.getElementById("stat-hp").textContent = `HP:${hp}`;
+    document.getElementById("stat-energy").textContent = `EN:${energy}`;
+    document.getElementById("energy-desc").textContent = `recovers ${energyRecoveryAmount} every ${energyRecovery} turns, turn is ${turn}`;
+
+    if (currentUser != "scribe") {
+        document.getElementById("basic-stats").style.visibility = 'hidden';
+        document.getElementById("energy-desc").style.visibility = 'hidden';
+    }
+    else {
+        document.getElementById("basic-stats").style.visibility = '';
+        document.getElementById("energy-desc").style.visibility = '';
+    }
 
     // update secret goal
     document.getElementById('secret').textContent = "Secret goal: " + secret;
@@ -178,7 +207,7 @@ connection.on("Win", function (mystery) {
 
     document.querySelector("#win > h2").textContent = m;
     document.getElementById("win").style.display = '';
-    document.getElementById("main").style.display = 'none';
+    document.getElementById("game").style.display = 'none';
 });
 
 connection.on("Lose", function (mystery) {
@@ -188,7 +217,7 @@ connection.on("Lose", function (mystery) {
 
     document.querySelector("#lose > h2").textContent = m;
     document.getElementById("lose").style.display = '';
-    document.getElementById("main").style.display = 'none';
+    document.getElementById("game").style.display = 'none';
 });
 
 connection.on("RoleSelected", function (role) {
@@ -204,7 +233,7 @@ connection.start().then(function () {
     return console.error(err.toString());
 });
 
-document.querySelectorAll("button.action").forEach(x => x.addEventListener("click", function (e) {
+document.querySelectorAll("#actions-list button").forEach(x => x.addEventListener("click", function (e) {
     let action = e.target.dataset.val;
 
     console.log("startvoting for " + action);

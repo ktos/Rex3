@@ -24,6 +24,16 @@
 
     <canvas id="canvas"></canvas>
 
+    <div id="debug" class="col-6">
+        <button>gamestarted</button>
+        <button>win</button>
+        <button>lose</button>
+        <button>next</button>
+        <button>hit</button>
+
+        <div id="debug-log"></div>
+    </div>
+
     <div id="page">
         <div id="page-header">
             <header>
@@ -44,7 +54,7 @@
                 <div class="form-container">
                     <label>
                         <input type="radio" name="test" value="ch1" id="bclairvoyant">
-                        <img src="images/portret-template.gif" />
+                        <img src="~/images/character_2.png" />
 
                         <div class="overlay">
                             <div class="character-description">
@@ -57,7 +67,7 @@
 
                     <label>
                         <input type="radio" name="test" value="ch2" id="bscribe">
-                        <img src="images/portret-template.gif" />
+                        <img src="~/images/character_1.png" />
 
                         <div class="overlay">
                             <div class="character-description">
@@ -71,7 +81,7 @@
 
                     <label>
                         <input type="radio" name="test" value="ch3" id="bnavigator">
-                        <img src="images/portret-template.gif" />
+                        <img src="~/images/character_3.png" />
 
                         <div class="overlay">
                             <div class="character-description">
@@ -88,65 +98,197 @@
 
         </section>
 
-        <section id="game" style="display: none">
-            <div id="win">
-                <h1>You win!</h1>
-                <h2></h2>
-            </div>
+        <div id="game" class="game">
 
-            <div id="lose">
-                <h1>You lose!</h1>
-                <h2></h2>
-            </div>
+            <section id="game-bar-top" class="section-description broider">
 
-            <div id="role">
-                <button id="bclairvoyant">Clairvoyant</button>
-                <button id="bscribe">Scribe</button>
-                <button id="bnavigator">Navigator</button>
-            </div>
+                <div id="basic-stats" class="game-bar-top-item">
 
-            <div id="debug" class="col-6">
-                <button>gamestarted</button>
-                <button>win</button>
-                <button>lose</button>
-                <button>next</button>
-                <button>hit</button>
+                    <p class="stat" id="stat-hp"></p>
+                    <p class="stat" id="stat-energy"></p>
 
-                <div id="debug-log"></div>
-            </div>
-
-            <div id="main">
-                <button class="action" data-val="0" id="north">North</button>
-                <button class="action" data-val="1" id="east">East</button>
-                <button class="action" data-val="2" id="west">West</button>
-                <button class="action" data-val="3" id="south">South</button>
-                <button class="action" data-val="4" id="rest">Rest</button>
-
-                <button class="action" data-val="5" id="special">Special</button>
-
-
-                <div id="voting">
-                    <p id="action"></p>
-                    <button data-val="1">Yes</button>
-                    <button data-val="0">No</button>
                 </div>
 
-                <div id="map">
+                <div id="portrets" class="game-bar-top-item">
+
+                    <div class="left-container">
+                        <img src="images/character_1.PNG" class="other-portret" />
+                        <img src="images/character_2.PNG" class="other-portret" />
+                    </div>
+
+                    <div class="right-container">
+                        <img src="images/character_3.PNG" class="main-portret" />
+                    </div>
+
                 </div>
-            </div>
+
+                <div id="special-skills" class="game-bar-top-item">
+
+                    <ul>
+                        <li id="special-skill-desc">skill_1</li>
+                        <li id="energy-desc">skill_1</li>
+                    </ul>
+
+                </div>
+
+            </section>
+
+            <section id="game-map" class="section-description broider">
+            </section>
 
 
+            <section id="game-options" class="tabset broider">
+                <input type="radio" name="tabset_1" id="tabset_1_actions" hidden aria-hidden="true" checked>
+                <input type="radio" name="tabset_1" id="tabset_1_equipment" hidden aria-hidden="true">
+                <input type="radio" name="tabset_1" id="tabset_1_logs" hidden aria-hidden="true">
 
-            <div id="votinghistory"></div>
+                <ul hidden aria-hidden="true">
+                    <li><label for="tabset_1_actions">Actions</label></li>
+                    <li><label for="tabset_1_equipment">Equipment</label></li>
+                    <li><label for="tabset_1_logs">Logs</label></li>
 
-            <div id="secret">
-            </div>
+                </ul>
 
-            <div id="scribe">
+                <div>
 
-            </div>
-        </section>
+                    <section>
+                        <h2>Actions</h2>
 
+                        <form id="action-voting">
+                            <div id="voting">
+                                <p id="action"></p>
+                                <button data-val="1">Yes</button>
+                                <button data-val="0">No</button>
+                            </div>
+
+                            <label>
+                                <input type="radio" name="yes" value="yes">
+                            </label>
+                            <label>
+                                <input type="radio" name="no" value="no">
+                            </label>
+                        </form>
+
+                        <div id="actions-list">
+
+                            <div class="action-list-section">
+                                <label>
+                                    <button id="north" data-val="0" title="Up">
+                                        <img src="images/action_move_up.PNG" data-val="0" />
+                                    </button>
+                                </label>
+
+                                <label>
+                                    <button id="south" data-val="3" title="Down">
+                                        <img src="images/action_move_down.PNG" data-val="3" />
+                                    </button>
+                                </label>
+
+                                <label>
+                                    <button id="rest" data-val="4" title="Rest">
+                                        <img src="images/action_rest.PNG" data-val="4" />
+                                    </button>
+                                </label>
+                            </div>
+
+                            <div class="action-list-section">
+                                <label>
+                                    <button id="west" data-val="1" title="Left">
+                                        <img src="images/action_move_left.PNG" data-val="1" />
+                                    </button>
+                                </label>
+
+                                <label>
+                                    <button id="east" data-val="2" title="Right">
+                                        <img src="images/action_move_right.PNG" data-val="2" />
+                                    </button>
+                                </label>
+
+                                <label>
+                                    <button id="special" data-val="special" title="Special Action">
+                                        <img src="images/action_special.png" data-val="0" />
+                                    </button>
+                                </label>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section>
+                        <h2>Secret goal</h2>
+
+                        <form id="equipment-list">
+                            <p id="secret"></p>
+                        </form>
+
+                    </section>
+
+                    <section class="display-logs">
+                        <h2>Logs</h2>
+
+                        <div id="votinghistory">
+                            <p>
+                                <b>[10:00] left - move </b>Podjęcie decyzji zajęło 5.001s
+                            </p>
+                            <p>
+                                <b>[9:45] up -move </b>Podjęcie decyzji zajęło 15.001s
+                            </p>
+                            <p>
+                                <b>[9:35] up - attack </b>Podjęcie decyzji zajęło 2.001s
+                            </p>
+                            <p>
+                                <b>[9:20] left -move </b>Podjęcie decyzji zajęło 45.001s
+                            </p>
+                            <p>
+                                <b>[9:00] down - move </b>Podjęcie decyzji zajęło 2.001s
+                            </p>
+                            <p>
+                                <b>[8:00] left - move </b>Podjęcie decyzji zajęło 5.001s
+                            </p>
+                            <p>
+                                <b>[7:00] up -move </b>Podjęcie decyzji zajęło 15.001s
+                            </p>
+                            <p>
+                                <b>[6:00] up - attack </b>Podjęcie decyzji zajęło 2.001s
+                            </p>
+                            <p>
+                                <b>[5:00] left -move </b>Podjęcie decyzji zajęło 45.001s
+                            </p>
+                            <p>
+                                <b>[4:00] down - move </b>Podjęcie decyzji zajęło 2.001s
+                            </p>
+                            <p>
+                                <b>[3:00] left - move </b>Podjęcie decyzji zajęło 5.001s
+                            </p>
+                            <p>
+                                <b>[2:00] up -move </b>Podjęcie decyzji zajęło 15.001s
+                            </p>
+                            <p>
+                                <b>[1:00] up - attack </b>Podjęcie decyzji zajęło 2.001s
+                            </p>
+                        </div>
+
+
+                    </section>
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+
+        <div id="win">
+            <h1>You win!</h1>
+            <h2></h2>
+        </div>
+
+        <div id="lose">
+            <h1>You lose!</h1>
+            <h2></h2>
+        </div>
 
         <section id="rules" class="section-description">
             <h2>Game Rules</h2>
@@ -219,17 +361,18 @@
                     <ul>
                         <li>
                             <p class="name">
-                                <a href="">Marcin Badurowicz</a>
+                                <a href="https://ktos.info">Marcin Badurowicz</a> server + client + story
                             </p>
                         </li>
                         <li>
                             <p class="name">
-                                <a href="">Maryla Maja</a>
+                                <a href="#">Marylka</a> music + sfx
                             </p>
                         </li>
                         <li>
                             <p class="name">
-                                <a href="">Stanisław Skulimowski</a>
+                                <a href="https://stanislawskulimowski.com">Stanisław Skulimowski</a> frontend + graphics
+                                + story
                             </p>
                         </li>
                     </ul>

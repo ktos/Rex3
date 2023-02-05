@@ -1,10 +1,10 @@
 :root {
-	--color-main: #3F334D;
-	--color-secondary: #434F5A;
-	--color-acent: #C0C5C1;
-	--color-acent-hover: #EAF0CE;
-	--color-main-text: #1E1825;
-
+	--color-main: #3b4040;
+	--color-secondary: #535858;
+	--color-acent: #6d7272;
+	--color-acent-hover: #c2c5c5;
+	--color-main-text: #c2c5c5;
+	--color-light-borders: #bdc0c0;
 }
 
 @font-face {
@@ -83,12 +83,23 @@ body {
 	outline: 2px solid #f00;
 }
 
+[type=radio]:checked+img {
+	outline: 2px solid #f00;
+}
+
 [type=radio]:disabled+img {
 	outline: 2px solid #434F5A;
 }
 
 input[type=radio].active+img {
 	outline: 2px solid #f00;
+}
+
+#debug {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 300px;
 }
 
 body {
@@ -110,15 +121,17 @@ a:hover {
 	color: var(--color-acent-hover);
 }
 
+p {
+	text-shadow: 1px 1px black;
+}
+
 #canvas {
 	position: fixed;
 	z-index: -1;
 }
 
 .broider {
-	border-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAHdJREFUOE9jZKABYEQz8z8FdsDNQjYUZCCITykNNgQEKDUIRT+yoSDDYS4lNRSQ9TFicynMcGINhsUDPOhwuRQ9AvFZgOx1sINGXQpPUsixPxqmxCZTcG5ECbqhn06J9jua13HmKIqLP5qWpzDvUr3kJzUccaoHAD1yWhYdG3akAAAAAElFTkSuQmCC") 7 / 7px / 0 round;
-	border-width: 7px;
-	border-style: solid;
+	border: 1px solid var(--color-light-borders);
 }
 
 #page {
@@ -126,7 +139,7 @@ a:hover {
 	margin: 10px auto;
 	width: 400px;
 	box-shadow: black 0px 0px 60px 60px;
-
+	padding: 2px 0;
 }
 
 
@@ -138,7 +151,7 @@ a:hover {
 
 #gametitle {
 	float: left;
-	padding: 0 6px;
+	padding: 0 16px;
 
 }
 
@@ -205,7 +218,7 @@ a:hover {
 }
 
 #character-selection label:hover .overlay,
-#character-selection input:disabled~.overlay {
+#character-selection input:checked~.overlay {
 	height: 100%;
 }
 
@@ -269,8 +282,9 @@ a:hover {
 .section-description h3 {
 	text-align: center;
 	font-family: absinthelyric;
-	color: var(--color-main-text);
+	color: var(--color-main);
 	margin: 0 0 10px;
+	font-size: 30px;
 }
 
 .section-description .content {}
@@ -288,38 +302,387 @@ a:hover {
 
 
 
-#game-bar-top {}
+#game-bar-top {
+	overflow: hidden;
+	padding: 0px 10px;
+	width: 360px;
+	margin: 8px auto;
+}
 
-#game-bar-top .game-bar-top-item {}
+#game-bar-top .game-bar-top-item {
+	float: left;
+	height: 90px;
+	margin-right: 10px;
+}
 
-#basic-stats {}
+#game-bar-top .game-bar-top-item:last-child {
+	margin-right: 0;
+}
 
-#portrets {}
+#basic-stats {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
 
-#portrets .other-portret {}
+#basic-stats .stat {
+	flex: 1;
+}
 
-#portrets .main-portret {}
+#portrets {
+	display: flex;
+}
 
-#special-skills {}
+#portrets .left-container {
+	display: flex;
+	flex-direction: column;
+}
 
-#game-map {}
+#portrets .other-portret {
+	height: 45px;
+}
+
+#portrets .main-portret {
+	height: 90px;
+}
+
+#special-skills {
+	float: none !important;
+	overflow: hidden;
+}
+
+#game-map {
+	width: 380px;
+	aspect-ratio: 1/1;
+	overflow: auto;
+	-ms-overflow-style: none;
+	/* IE and Edge */
+	scrollbar-width: none;
+	/* Firefox */
+	margin: 0 auto 4px;
+	padding: 0;
+}
+
+#game-map::-webkit-scrollbar {
+	display: none;
+}
 
 #main-map {
-	width: 100%;
-	table-layout: fixed;
+	width: 530px;
 }
 
 #main-map tr {}
 
-
 #main-map td {
-	width: 10%;
+	width: 60px;
+	height: 60px;
 	position: relative;
 	border: 1px solid black;
+	background-size: 100%;
+	background-repeat: no-repeat;
+	position: relative;
 }
 
 #main-map td:after {
 	content: '';
 	display: block;
 	margin-top: 100%;
+}
+
+#main-map td.background_left_top {
+	background-image: url("../images/maze/maze_corner_bottom_right.PNG");
+}
+
+#main-map td.background_top_right {
+	background-image: url("../images/maze/maze_corner_bottom_left.PNG");
+}
+
+#main-map td.background_left_bottom {
+	background-image: url("../images/maze/maze_corner_top_right.PNG");
+}
+
+#main-map td.background_right_bottom {
+	background-image: url("../images/maze/maze_corner_top_left.PNG");
+}
+
+#main-map td.background_left_top_bottom {
+	background-image: url("../images/maze/maze_left_end.PNG");
+}
+
+#main-map td.background_left_top_right {
+	background-image: url("../images/maze/maze_top_end.PNG");
+}
+
+#main-map td.background_top_right_bottom {
+	background-image: url("../images/maze/maze_right_end.PNG");
+}
+
+#main-map td.background_top_left_right {
+	background-image: url("../images/maze/maze_top_end.PNG");
+}
+
+#main-map td.background_left_right_bottom {
+	background-image: url("../images/maze/maze_bottom_end.PNG");
+}
+
+#main-map td.background_top_bottom {
+	background-image: url("../images/maze/maze_straight_horizontal.PNG");
+}
+
+#main-map td.background_left_right {
+	background-image: url("../images/maze/maze_straight_vertical.PNG");
+}
+
+#main-map td.background_top {
+	background-image: url("../images/maze/maze_ycross_bottom.PNG");
+}
+
+#main-map td.background_bottom {
+	background-image: url("../images/maze/maze_ycross_top.PNG");
+}
+
+#main-map td.background_right {
+	background-image: url("../images/maze/maze_ycross_left.PNG");
+}
+
+#main-map td.background_left {
+	background-image: url("../images/maze/maze_ycross_right.PNG");
+}
+
+#main-map td.background_ {
+	background-image: url("../images/maze/maze_xcross.PNG");
+}
+
+#main-map td.background_full_wall {
+	background-image: url("../images/maze/maze_full_wall.PNG");
+}
+
+#main-map td.background_hidden {
+	background-image: url("../images/maze/maze_hidden.PNG");
+}
+
+#main-map td div {
+	position: absolute;
+	top: 19px;
+	left: 19px;
+	width: 40px;
+	height: 40px;
+}
+
+.element {
+	background-size: 88%;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.element.player {
+	background-image: url("../images/icon_player.PNG");
+}
+
+.element.enemy {
+	background-image: url("../images/icon_enemy.PNG");
+}
+
+.element.item {
+	background-image: url("../images/icon_chest.PNG");
+}
+
+.element.endpoint {
+	background-image: url("../images/icon_end.PNG");
+}
+
+#game-options {
+	margin: 10px auto;
+	padding: 0 10px 10px;
+	width: 360px;
+}
+
+
+
+
+
+
+#action-voting {}
+
+#action-voting label {}
+
+#action-voting input {}
+
+#actions-list {
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+}
+
+#actions-list .action-list-section {
+	display: table-row;
+	margin-bottom: 10px;
+}
+
+#actions-list label {
+	display: table-cell;
+	aspect-ratio: 1/1;
+	text-align: center;
+	overflow: auto;
+	padding-bottom: 10px;
+}
+
+#actions-list input {}
+
+#actions-list img {
+	height: 80px;
+	width: 80px;
+}
+
+
+
+
+
+#equipment-list {}
+
+
+
+#equipment-list label {
+	display: inline-block;
+	width: 100%;
+	position: relative;
+	clear: both;
+	padding-bottom: 10px;
+}
+
+#equipment-list input {}
+
+#equipment-list img {
+	display: block;
+	height: 60px;
+	width: 60px;
+	float: left;
+}
+
+#equipment-list p {
+	float: left;
+	padding-left: 10px;
+}
+
+
+
+
+.display-logs {}
+
+
+
+.display-logs p {}
+
+.display-logs b {}
+
+
+
+
+
+
+
+.tabset>input {
+	display: block;
+	/* "enable" hidden elements in IE/edge */
+	position: absolute;
+	/* then hide them off-screen */
+	left: -100%;
+}
+
+.tabset>ul {
+	position: relative;
+	z-index: 999;
+	list-style: none;
+	display: table;
+	margin-bottom: -1px;
+	padding: 0px;
+	table-layout: fixed;
+	overflow: hidden;
+	width: 100%;
+}
+
+.tabset>ul li {
+	display: table-cell;
+}
+
+.tabset>ul label {
+	display: inline-block;
+	padding: 1.15em 0;
+	background: var(--color-main);
+	font-family: absinthelyric;
+	font-size: 12px;
+	width: 100%;
+	text-align: center;
+}
+
+.tabset>div {
+	position: relative;
+	background: var(--color-secondary);
+	display: flex;
+	height: 200px;
+	overflow-y: scroll;
+	-ms-overflow-style: none;
+	/* IE and Edge */
+	scrollbar-width: none;
+	/* Firefox */
+}
+
+.tabset>div::-webkit-scrollbar {
+	display: none;
+}
+
+.tabset>input:nth-child(1):focus~ul li:nth-child(1) label,
+.tabset>input:nth-child(2):focus~ul li:nth-child(2) label,
+.tabset>input:nth-child(3):focus~ul li:nth-child(3) label,
+.tabset>input:nth-child(4):focus~ul li:nth-child(4) label,
+.tabset>input:nth-child(5):focus~ul li:nth-child(5) label,
+.tabset>input:nth-child(6):focus~ul li:nth-child(6) label,
+.tabset>input:nth-child(7):focus~ul li:nth-child(7) label,
+.tabset>input:nth-child(8):focus~ul li:nth-child(8) label,
+.tabset>input:nth-child(9):focus~ul li:nth-child(9) label {
+	text-decoration: underline;
+}
+
+.tabset>input:nth-child(1):checked~ul li:nth-child(1) label,
+.tabset>input:nth-child(2):checked~ul li:nth-child(2) label,
+.tabset>input:nth-child(3):checked~ul li:nth-child(3) label,
+.tabset>input:nth-child(4):checked~ul li:nth-child(4) label,
+.tabset>input:nth-child(5):checked~ul li:nth-child(5) label,
+.tabset>input:nth-child(6):checked~ul li:nth-child(6) label,
+.tabset>input:nth-child(7):checked~ul li:nth-child(7) label,
+.tabset>input:nth-child(8):checked~ul li:nth-child(8) label,
+.tabset>input:nth-child(9):checked~ul li:nth-child(9) label {
+	background: var(--color-secondary);
+}
+
+.tabset>div>section,
+.tabset>div>section h2 {
+	position: absolute;
+	top: -999em;
+	left: -999em;
+}
+
+.tabset>div>section {
+	padding: 1em 1em 0;
+}
+
+.tabset>input:nth-child(1):checked~div>section:nth-child(1),
+.tabset>input:nth-child(2):checked~div>section:nth-child(2),
+.tabset>input:nth-child(3):checked~div>section:nth-child(3),
+.tabset>input:nth-child(4):checked~div>section:nth-child(4),
+.tabset>input:nth-child(5):checked~div>section:nth-child(5),
+.tabset>input:nth-child(6):checked~div>section:nth-child(6),
+.tabset>input:nth-child(7):checked~div>section:nth-child(7),
+.tabset>input:nth-child(8):checked~div>section:nth-child(8),
+.tabset>input:nth-child(9):checked~div>section:nth-child(9) {
+	position: Static;
+}
+
+.tabset>ul label {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
