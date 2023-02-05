@@ -56,7 +56,9 @@ connection.on("GameStarted", function () {
     console.log("game started");
     document.getElementById('character-selection').style.display = 'none';
     document.getElementById('game').style.display = '';
-    document.getElementById("audio-level1").play();
+
+    if (currentUser == "navigator")
+        document.getElementById("audio-level1").play();
 });
 
 connection.on("MapUpdate", function (state) {
@@ -214,7 +216,7 @@ connection.on("Win", function (mystery) {
     console.log(mystery)
     let m = JSON.parse(mystery)
 
-    document.querySelector("#win > h2").textContent = m;
+    document.querySelector("#win > p").textContent = m;
     document.getElementById("win").style.display = '';
     document.getElementById("game").style.display = 'none';
     document.getElementById("audio-final").play();
@@ -225,7 +227,7 @@ connection.on("Lose", function (mystery) {
     console.log(mystery)
     let m = JSON.parse(mystery)
 
-    document.querySelector("#lose > h2").textContent = m;
+    document.querySelector("#lose > p").textContent = m;
     document.getElementById("lose").style.display = '';
     document.getElementById("game").style.display = 'none';
     document.getElementById("audio-final").play();
