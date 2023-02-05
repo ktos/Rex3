@@ -276,10 +276,12 @@ namespace Rex3.Hubs
                                         rnd.Next(0, _state.CurrentMaze.Width),
                                         rnd.Next(0, _state.CurrentMaze.Height)
                                     );
+                                    _state.CurrentLevel.SpecialActionUsed = true;
                                     _state.Energy--;
                                     break;
                                 case Action.Sacrifice:
                                     _state.HP = 0;
+                                    _state.CurrentLevel.SpecialActionUsed = true;
                                     break;
                             }
                         }

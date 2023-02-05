@@ -23,7 +23,8 @@ document.getElementById("lose").style.display = 'none';
 document.getElementById("game").style.display = 'none';
 
 connection.on("VotingStarted", function (user, action) {
-    console.log("voting started for action " + action)
+    console.log("voting started for action " + action);
+    document.getElementById("sfx-votestart").play();
 
     showVoting();
 });
@@ -36,10 +37,17 @@ connection.on("VoteReceived", function (user) {
 
 connection.on("VotingFinished", function (result) {
     console.log("voting finished")
+
+    if (result)
+        document.getElementById("sfx-voteend").play();
+    else
+        document.getElementById("sfx-voteendfail").play();
+
     hideVoting();
 });
 
 connection.on("VotingInconclusive", function () {
+    document.getElementById("sfx-voteendfail").play();
     hideVoting();
     console.log("voting inconclusive, you die");
 });
@@ -48,6 +56,7 @@ connection.on("GameStarted", function () {
     console.log("game started");
     document.getElementById('character-selection').style.display = 'none';
     document.getElementById('game').style.display = '';
+    document.getElementById("audio-level1").play();
 });
 
 connection.on("MapUpdate", function (state) {
@@ -208,6 +217,7 @@ connection.on("Win", function (mystery) {
     document.querySelector("#win > h2").textContent = m;
     document.getElementById("win").style.display = '';
     document.getElementById("game").style.display = 'none';
+    document.getElementById("audio-final").play();
 });
 
 connection.on("Lose", function (mystery) {
@@ -218,6 +228,7 @@ connection.on("Lose", function (mystery) {
     document.querySelector("#lose > h2").textContent = m;
     document.getElementById("lose").style.display = '';
     document.getElementById("game").style.display = 'none';
+    document.getElementById("audio-final").play();
 });
 
 connection.on("RoleSelected", function (role) {
@@ -300,3 +311,10 @@ document.querySelectorAll("#character-selection input").forEach(x => x.addEventL
     });
     e.preventDefault();
 }));
+
+var audiointro = document.getElementById("audio-intro");
+
+audiointro.addEventListener("canplaythrough", (event) => {
+    /* the audio is now playable; play it if permissions allow */
+    audiointro.play();
+});
