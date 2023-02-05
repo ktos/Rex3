@@ -47,19 +47,20 @@ namespace Rex3
 
         public bool? CalculateResult()
         {
-            return true; // debug only
+            //return true; // debug only
 
             // depending on the action all of them must agree or only two
-            if (Action == Action.ChangeEnemiesHp)
-            {
-                if (!Clairvoyant.HasValue || !Navigator.HasValue || !Scribe.HasValue)
-                    return null;
+            // pre-final: everyone must agree
+            //if (Action == Action.ChangeEnemiesHp || Action == Action.Sacrifice || Action == Action.Teleport)
+            //{
+            if (!Clairvoyant.HasValue || !Navigator.HasValue || !Scribe.HasValue)
+                return null;
 
-                if (Clairvoyant.Value && Navigator.Value && Scribe.Value)
-                    return true;
+            if (Clairvoyant.Value && Navigator.Value && Scribe.Value)
+                return true;
 
-                return false;
-            }
+            return false;
+            /*}
             else
             {
                 if (!Clairvoyant.HasValue || !Navigator.HasValue || !Scribe.HasValue)
@@ -74,7 +75,7 @@ namespace Rex3
                     return true;
 
                 return false;
-            }
+            }*/
         }
     }
 

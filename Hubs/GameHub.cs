@@ -217,9 +217,8 @@ namespace Rex3.Hubs
 
                 await Clients.All.SendAsync("VoteReceived", user);
 
-                // tymczasowo, głosowanie zawsze jest udane, po jednym
-                //if (_state.Current.IsFinished())
-                if (true)
+                if (_state.Current.IsFinished())
+                //if (true)
                 {
                     await Clients.All.SendAsync("VotingFinished", true);
 

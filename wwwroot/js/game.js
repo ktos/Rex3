@@ -257,10 +257,10 @@ document.querySelectorAll("#actions-list button").forEach(x => x.addEventListene
 
     // but also invoking voting timeout function
     // setTimeout(function () {
-    //     connection.invoke("VotingTimeout", user).catch(function (err) {
+    //     connection.invoke("VotingTimeout", currentUser).catch(function (err) {
     //         return console.error(err.toString());
     //     });
-    // }, 5000);
+    // }, 10000);
 
     e.preventDefault();
 }));
