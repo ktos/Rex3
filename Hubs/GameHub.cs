@@ -11,11 +11,23 @@ namespace Rex3.Hubs
     {
         private readonly GameState _state;
         private readonly Random rnd;
+        private readonly IList<SecretGoal> possibleGoals;
+        private readonly List<Action> specialActions;
 
         public GameHub(GameState state)
         {
             _state = state;
             rnd = new Random();
+
+            possibleGoals = Enum.GetValues<SecretGoal>().Shuffle(rnd).ToList();
+            specialActions = new List<Action>()
+            {
+                Action.ChangeEnemiesHp,
+                Action.Sacrifice,
+                Action.Teleport
+            }
+                .Shuffle(rnd)
+                .ToList();
         }
 
         private async Task NextLevel()
@@ -46,7 +58,7 @@ namespace Rex3.Hubs
                 _state.CurrentLevel.NavigatorGoal = SecretGoal.None;
                 _state.CurrentLevel.ScribeGoal = SecretGoal.None;
 
-                _state.CurrentLevel.SpecialAction = Action.ChangeEnemiesHp;
+                _state.CurrentLevel.SpecialAction = specialActions[_state.CurrentLevelIndex];
 
                 GenerateEnemies(3, 3);
                 GenerateBoxes(3, 2, 2);
@@ -84,6 +96,16 @@ namespace Rex3.Hubs
 
                 if (_state.Energy < 5)
                     _state.CurrentLevel.EnergyRecoveryAmount = 1;
+
+                _state.CurrentLevel.ClairvoyantGoal = possibleGoals[
+                    (_state.CurrentLevelIndex - 1) * 2
+                ];
+                _state.CurrentLevel.NavigatorGoal = possibleGoals[
+                    (_state.CurrentLevelIndex - 1) * 2 + 1
+                ];
+                _state.CurrentLevel.ScribeGoal = possibleGoals[
+                    (_state.CurrentLevelIndex - 1) * 2 + 2
+                ];
             }
         }
 
@@ -239,6 +261,7 @@ namespace Rex3.Hubs
                                 case Action.Rest:
                                     _state.Energy--;
                                     _state.HP += 1;
+                                    _state.CurrentLevel.RestCount++;
                                     break;
                                 case Action.ChangeEnemiesHp:
                                     _state.Energy--;
@@ -247,6 +270,16 @@ namespace Rex3.Hubs
                                         e.HP = 1;
                                     }
                                     _state.CurrentLevel.SpecialActionUsed = true;
+                                    break;
+                                case Action.Teleport:
+                                    _state.CurrentLocation = new Point(
+                                        rnd.Next(0, _state.CurrentMaze.Width),
+                                        rnd.Next(0, _state.CurrentMaze.Height)
+                                    );
+                                    _state.Energy--;
+                                    break;
+                                case Action.Sacrifice:
+                                    _state.HP = 0;
                                     break;
                             }
                         }
@@ -286,8 +319,9 @@ namespace Rex3.Hubs
                     {
                         await NextLevel();
                     }
-                    else if (_state.HP == 0)
+                    else if (_state.HP <= 0)
                     {
+                        _state.CurrentLevel.IsDead = true;
                         await SendLose();
                     }
                     else

@@ -5,7 +5,11 @@ namespace Rex3.Models
     public enum SecretGoal
     {
         None,
-        KillThemAll
+        KillThemAll,
+        DoNotKill,
+        DoNotRest,
+        Die,
+        DoNotTake
     }
 
     public static class Extensions
@@ -19,6 +23,18 @@ namespace Rex3.Models
 
                 case SecretGoal.KillThemAll:
                     return level.Enemies.Count == 0;
+
+                case SecretGoal.DoNotKill:
+                    return level.Enemies.Count == level.EnemiesCount;
+
+                case SecretGoal.DoNotRest:
+                    return level.RestCount == 0;
+
+                case SecretGoal.Die:
+                    return level.IsDead;
+
+                case SecretGoal.DoNotTake:
+                    return level.Boxes.Count == level.BoxesCount;
 
                 default:
                     return false;
@@ -49,22 +65,30 @@ namespace Rex3.Models
         static Mysteries()
         {
             mysteries = new List<string>();
-            mysteries.Add("pierwsza tajemnica {0} {1} {2}");
-            mysteries.Add("druga tajemnica {0} {1} {2}");
-            mysteries.Add("trzecia tajemnica {0} {1} {2}");
+            mysteries.Add(
+                "First Mystery: AI was created by {0} over 50 years ago. Nobody knew they will be so fast in dominating the {1}. AI and humans are {2}."
+            );
+            mysteries.Add(
+                "Second Mystery: Going through the mazes of {0} is not easy, because there is a lot of {1}. Later, it was discovered that {2}."
+            );
+            mysteries.Add(
+                "Trzecia Tajemnica: Rex and SI always were {0}. It was one of the reasons he was called the renegade and banished from the Earth. Rex is however {1}, while the true {2}."
+            );
 
             secrets = new List<string>();
-            secrets.Add("część ukryta 1 1");
-            secrets.Add("część ukryta 1 2");
-            secrets.Add("część ukryta 1 3");
+            secrets.Add("humans");
+            secrets.Add("cyberspace");
+            secrets.Add("allies");
 
-            secrets.Add("część ukryta 2 1");
-            secrets.Add("część ukryta 2 2");
-            secrets.Add("część ukryta 2 3");
+            secrets.Add("your own memory");
+            secrets.Add("mad AIs, lost experiments and wildlings");
+            secrets.Add("you have to divide the AI into three parts for stability");
 
-            secrets.Add("część ukryta 3 1");
-            secrets.Add("część ukryta 3 2");
-            secrets.Add("część ukryta 3 3");
+            secrets.Add("close friends");
+            secrets.Add(
+                "an artificial human, a flesh body for a human mind, but a copy of the mind"
+            );
+            secrets.Add("the original Rex is You.");
         }
 
         public static string GenerateLoseMystery(Level level, int levelIndex)

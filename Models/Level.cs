@@ -16,5 +16,7 @@ namespace Rex3.Models
         public List<Box> Boxes { get; set; } = new List<Box>();
         public Action SpecialAction { get; internal set; }
         public bool SpecialActionUsed { get; internal set; } = false;
+        public int RestCount { get; set; }
+        public bool IsDead { get; set; }
     }
 }

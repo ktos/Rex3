@@ -86,5 +86,7 @@ namespace Rex3
         South,
         Rest,
         ChangeEnemiesHp,
+        Teleport,
+        Sacrifice
     }
 }

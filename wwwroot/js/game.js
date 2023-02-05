@@ -1,7 +1,7 @@
 ﻿"use strict";
 
-const goals = ["There is no special goal", "Kill all the enemies"]
-const specialActions = { 5: "Reduce HP of enemies" }
+const goals = ["There is no special goal", "Kill all the enemies", "Do not kill the enemies", "Do not rest", "Die", "Do not take objects"]
+const specialActions = { 5: "Reduce HP of enemies", 6: "Teleport randomly", 7: "Sacrifice" }
 
 let connection = new signalR.HubConnectionBuilder().withUrl("/game-hub").withAutomaticReconnect().build();
 
