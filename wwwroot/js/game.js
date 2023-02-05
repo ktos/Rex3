@@ -172,7 +172,7 @@ connection.on("MapUpdate", function (state) {
 
     // update special action
     document.getElementById("special").disabled = false;
-    document.getElementById("special").dataset.action = specialAction;
+    document.getElementById("special-img").dataset.val = specialAction;
     document.getElementById("special").title = specialActions[specialAction];
     document.getElementById("special-skill-desc").textContent = "Special skill: " + specialActions[specialAction];
     if (parsed.Level.SpecialActionUsed) {
